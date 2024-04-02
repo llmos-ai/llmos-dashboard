@@ -1,20 +1,23 @@
 package router
 
 import (
-	"database/sql"
+	"context"
 
 	"github.com/gin-gonic/gin"
 
+	"github.com/llmos/llmos-dashboard/pkg/generated/ent"
 	"github.com/llmos/llmos-dashboard/pkg/router/auth"
+	"github.com/llmos/llmos-dashboard/pkg/router/ollama"
 )
 
-type RegisterRouter func(*gin.Engine, *sql.DB)
+type RegisterRouter func(*gin.Engine, *ent.Client, context.Context)
 
 var registeredRouters = []RegisterRouter{
 	auth.RegisterAuthRoute,
+	ollama.RegisterOllama,
 }
 
-func RegisterRouters(r *gin.Engine, db *sql.DB) {
+func RegisterRouters(r *gin.Engine, c *ent.Client, ctx context.Context) {
 
 	// enable CORS for all origins
 	r.Use(CORSMiddleware())
@@ -25,6 +28,6 @@ func RegisterRouters(r *gin.Engine, db *sql.DB) {
 	r.GET("api/config", GetAPIConfig)
 
 	for _, router := range registeredRouters {
-		router(r, db)
+		router(r, c, ctx)
 	}
 }

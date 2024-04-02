@@ -1,36 +1,24 @@
 package database
 
 import (
-	"database/sql"
-	"log/slog"
+	"context"
+	"fmt"
 
 	_ "github.com/mattn/go-sqlite3"
 
-	"github.com/llmos/llmos-dashboard/pkg/database/auth"
+	"github.com/llmos/llmos-dashboard/pkg/generated/ent"
 )
 
 const dbFileName = "llmos-ui.db"
 
-type registerDB func(*sql.DB) error
-
-var registerDBs = []registerDB{
-	auth.RegisterUserDB,
-}
-
-func RegisterSQLiteDB() (*sql.DB, error) {
-	var err error
-	sql, err := sql.Open("sqlite3", dbFileName)
-	if err != nil || sql.Ping() != nil {
-		return sql, err
+func RegisterDBClient(ctx context.Context) (*ent.Client, error) {
+	client, err := ent.Open("sqlite3", fmt.Sprintf("file:%s?_fk=1", dbFileName))
+	if err != nil {
+		return nil, fmt.Errorf("failed opening connection to sqlite: %v", err)
 	}
-
-	for _, register := range registerDBs {
-		err = register(sql)
-		if err != nil {
-			slog.Error("Failed to register auth", err)
-			return nil, err
-		}
+	// Run the auto migration tool.
+	if err = client.Schema.Create(ctx); err != nil {
+		return nil, fmt.Errorf("failed creating schema resources: %v", err)
 	}
-
-	return sql, nil
+	return client, nil
 }

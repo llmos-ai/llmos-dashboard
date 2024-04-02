@@ -13,19 +13,9 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-const issuer = "llmos"
+const issuer = "llmos-issuer"
 
 var jwtKey = []byte("llmos_dashboard_key")
-
-//func NewJWTClaims() *Claims {
-//	return &Claims{
-//		Username: username,
-//		RegisteredClaims: jwt.RegisteredClaims{
-//			ExpiresAt: jwt.NewNumericDate(time),
-//			Issuer:    issuer,
-//		},
-//	}
-//}
 
 func GenerateToken(username string, time time.Time) (string, error) {
 	claims := Claims{

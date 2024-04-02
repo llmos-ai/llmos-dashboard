@@ -1,177 +1,79 @@
 package auth
 
 import (
-	"database/sql"
 	"fmt"
 	"log/slog"
-	"net/http"
-	"strings"
-	"time"
 
-	"github.com/gin-gonic/gin"
+	_ "github.com/mattn/go-sqlite3"
 
-	"github.com/llmos/llmos-dashboard/pkg/database/auth"
-	"github.com/llmos/llmos-dashboard/pkg/utils"
+	entv1 "github.com/llmos/llmos-dashboard/pkg/generated/ent"
+	"github.com/llmos/llmos-dashboard/pkg/generated/ent/user"
 )
 
-type Login struct {
-	Email    string `json:"email" binding:"required"`
-	Password string `json:"password" binding:"required"`
+type User struct {
+	ID           uint32 `json:"id"`
+	Name         string `json:"name"`
+	Email        string `json:"email"`
+	Password     string `json:"password"`
+	Role         string `json:"role"`
+	ProfileImage string `json:"profile_image_url"`
+	CreatedAt    string `json:"created_at"`
 }
 
-type SingUp struct {
-	Name string `json:"name" binding:"required"`
-	Login
-}
-
-type Handler struct {
-	db     *sql.DB
-	userDB auth.UserDB
-}
-
-func NewAuthHandler(db *sql.DB) Handler {
-	userDB := auth.NewUserDB(db)
-	return Handler{
-		db:     db,
-		userDB: userDB,
-	}
-}
-
-func (a *Handler) SignIn(c *gin.Context) {
-	var l Login
-	if err := c.ShouldBindJSON(&l); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	slog.Info("login info", l.Email)
-
-	user, err := a.userDB.GetUserByEmail(l.Email)
-	if err != nil || !utils.CheckPasswordHash(l.Password, user.Password) {
-		slog.Error("failed to get user", err)
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "unauthorized user, either email or password is invalid"})
-		return
-	}
-
-	expiredTime := time.Now().Add(7 * 24 * time.Hour)
-	tokenStr, err := utils.GenerateToken(user.Name, expiredTime)
+func (h *Handler) CreateUser(user User) (*entv1.User, error) {
+	slog.Info("Inserting user record ...", user.Email)
+	createdUser, err := h.client.User.
+		Create().
+		SetName(user.Name).
+		SetEmail(user.Email).
+		SetPassword(user.Password).
+		SetRole(user.Role).
+		SetProfileImageURL(user.ProfileImage).
+		Save(h.ctx)
 	if err != nil {
-		slog.Error("failed to generate token", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate token"})
-		return
+		return nil, err
 	}
-
-	c.SetCookie("llmos-token", tokenStr, 604800, "/", "localhost", false, true)
-	c.JSON(http.StatusOK, gin.H{
-		"token":             tokenStr,
-		"token_type":        "Bearer",
-		"id":                user.ID,
-		"email":             user.Email,
-		"name":              user.Name,
-		"role":              user.Role,
-		"profile_image_url": user.ProfileImage,
-	})
+	slog.Info("User created successfully", h)
+	return createdUser, nil
 }
 
-func (a *Handler) SignUp(c *gin.Context) {
-	var s SingUp
-	if err := c.ShouldBindJSON(&s); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	findUser, err := a.userDB.GetUserByEmail(s.Email)
-	if err != nil && !strings.Contains(err.Error(), "no rows in result") {
-		slog.Error("failed to get user", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to get user"})
-		return
-	}
-
-	if findUser.Email == s.Email {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "email already exists"})
-		return
-	}
-
-	hashPw, err := utils.HashPassword(s.Password)
+func (h *Handler) GetUserByEmail(email string) (*entv1.User, error) {
+	user, err := h.client.User.
+		Query().
+		Where(user.Email(email)).
+		// `Only` fails if no user found,
+		// or more than 1 user returned.
+		Only(h.ctx)
 	if err != nil {
-		slog.Error("failed to hash password", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to hash password"})
-		return
+		return nil, fmt.Errorf("failed querying user: %w", err)
 	}
-
-	user := auth.User{
-		Name:         s.Name,
-		Email:        s.Email,
-		Password:     hashPw,
-		Role:         "user",
-		ProfileImage: "",
-		CreatedAt:    time.Now().UTC().Format(time.RFC3339),
-	}
-
-	slog.Debug("signup info", s)
-	err = a.userDB.CreateUser(user)
-	if err != nil {
-		slog.Error("failed to create user", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"status": "you are logged in"})
+	slog.Debug("user returned: ", user)
+	return user, nil
 }
 
-func (a *Handler) GetSessionUser(c *gin.Context) {
-	userObj, exist := c.Get("user")
-	if !exist {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "empty user"})
-		return
+func (h *Handler) GetUserByUsername(username string) (*entv1.User, error) {
+	slog.Debug("Fetching user record by username ...")
+	user, err := h.client.User.
+		Query().
+		Where(user.Name(username)).
+		// `Only` fails if no user found,
+		// or more than 1 user returned.
+		Only(h.ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed querying user: %w", err)
 	}
-	fmt.Println(userObj)
-
-	user, ok := userObj.(auth.User)
-	fmt.Println(user, ok)
-	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to parse user obj"})
-		return
-	}
-
-	c.JSON(200, gin.H{
-		"id":                user.ID,
-		"email":             user.Email,
-		"name":              user.Name,
-		"role":              user.Role,
-		"profile_image_url": user.ProfileImage,
-	})
+	slog.Debug("user returned: ", h)
+	return user, nil
 }
 
-func (a *Handler) getSessionUser(token string) auth.User {
-	return auth.User{}
-}
-
-func (a *Handler) AuthMiddleware(c *gin.Context) {
-	slog.Debug("path", c.Request.URL.Path)
-	if strings.Contains(c.Request.URL.Path, "signin") || strings.Contains(c.Request.URL.Path, "signup") {
-		return
-	}
-
-	tokenString := c.GetHeader("Authorization")
-	if tokenString == "" {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "authorization header is required"})
-		return
-	}
-
-	tokenString = tokenString[len("Bearer "):]
-	claims, err := utils.VerifyToken(tokenString)
+func (h *Handler) DeleteUser(email string) error {
+	slog.Info("Deleting user record ...")
+	id, err := h.client.User.Delete().
+		Where(user.Email(email)).
+		Exec(h.ctx)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
-		return
+		return err
 	}
-
-	// if auth exist, find user by token
-	user, err := a.userDB.GetUserByUsername(claims.Username)
-	if err != nil {
-		slog.Error("failed to get user", err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to get user: %s", err.Error())})
-		return
-	}
-	c.Set("user", user)
-	c.Next()
+	slog.Info("User deleted successfully", id)
+	return nil
 }
