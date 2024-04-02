@@ -1,0 +1,6 @@
+node_modules
+build
+vendor
+/.svelte-kit
+vite.config.ts.timestamp*
+llmos-ui.db
