@@ -7,7 +7,7 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 
-	entv1 "github.com/llmos/llmos-dashboard/pkg/generated/ent"
+	entv1 "github.com/llmos-ai/llmos-dashboard/pkg/generated/ent"
 )
 
 type Handler struct {

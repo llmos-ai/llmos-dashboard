@@ -24,15 +24,15 @@ import (
 	"reflect"
 
 	"github.com/google/uuid"
-	"github.com/llmos/llmos-dashboard/pkg/generated/ent/migrate"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/migrate"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
-	"github.com/llmos/llmos-dashboard/pkg/generated/ent/chat"
-	"github.com/llmos/llmos-dashboard/pkg/generated/ent/modelfile"
-	"github.com/llmos/llmos-dashboard/pkg/generated/ent/user"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/chat"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/modelfile"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/user"
 )
 
 // Client is the client that holds all ent builders.

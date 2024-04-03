@@ -10,10 +10,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/llmos/llmos-dashboard/pkg/constant"
-	entv1 "github.com/llmos/llmos-dashboard/pkg/generated/ent"
-	entv1User "github.com/llmos/llmos-dashboard/pkg/generated/ent/user"
-	"github.com/llmos/llmos-dashboard/pkg/utils"
+	"github.com/llmos-ai/llmos-dashboard/pkg/constant"
+	entv1 "github.com/llmos-ai/llmos-dashboard/pkg/generated/ent"
+	entv1User "github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/user"
+	"github.com/llmos-ai/llmos-dashboard/pkg/utils"
 )
 
 const tokenType = "Bearer"

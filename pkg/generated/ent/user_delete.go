@@ -22,8 +22,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/llmos/llmos-dashboard/pkg/generated/ent/predicate"
-	"github.com/llmos/llmos-dashboard/pkg/generated/ent/user"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/predicate"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/user"
 )
 
 // UserDelete is the builder for deleting a User entity.

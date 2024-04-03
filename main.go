@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"os"
 
-	"github.com/llmos/llmos-dashboard/pkg/server"
+	"github.com/llmos-ai/llmos-dashboard/pkg/server"
 )
 
 func main() {

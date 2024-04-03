@@ -6,7 +6,7 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 
-	"github.com/llmos/llmos-dashboard/pkg/generated/ent"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent"
 )
 
 const dbFileName = "llmos-ui.db"

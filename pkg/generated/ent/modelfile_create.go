@@ -24,7 +24,7 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/llmos/llmos-dashboard/pkg/generated/ent/modelfile"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/modelfile"
 )
 
 // ModelfileCreate is the builder for creating a Modelfile entity.

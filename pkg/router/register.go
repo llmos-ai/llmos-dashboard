@@ -5,12 +5,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/llmos/llmos-dashboard/pkg/generated/ent"
-	"github.com/llmos/llmos-dashboard/pkg/router/auth"
-	"github.com/llmos/llmos-dashboard/pkg/router/litellm"
-	"github.com/llmos/llmos-dashboard/pkg/router/ollama"
-	"github.com/llmos/llmos-dashboard/pkg/router/openai"
-	"github.com/llmos/llmos-dashboard/pkg/router/webapi"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent"
+	"github.com/llmos-ai/llmos-dashboard/pkg/router/auth"
+	"github.com/llmos-ai/llmos-dashboard/pkg/router/litellm"
+	"github.com/llmos-ai/llmos-dashboard/pkg/router/ollama"
+	"github.com/llmos-ai/llmos-dashboard/pkg/router/openai"
+	"github.com/llmos-ai/llmos-dashboard/pkg/router/webapi"
 )
 
 type RegisterRouter func(*gin.Engine, *ent.Client, context.Context) error

@@ -25,8 +25,8 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
-	"github.com/llmos/llmos-dashboard/pkg/generated/ent/chat"
-	"github.com/llmos/llmos-dashboard/pkg/generated/ent/user"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/chat"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/user"
 )
 
 // UserCreate is the builder for creating a User entity.

@@ -6,10 +6,10 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/llmos/llmos-dashboard/pkg/api/auth"
-	"github.com/llmos/llmos-dashboard/pkg/api/chat"
-	"github.com/llmos/llmos-dashboard/pkg/api/modelfile"
-	"github.com/llmos/llmos-dashboard/pkg/generated/ent"
+	"github.com/llmos-ai/llmos-dashboard/pkg/api/auth"
+	"github.com/llmos-ai/llmos-dashboard/pkg/api/chat"
+	"github.com/llmos-ai/llmos-dashboard/pkg/api/modelfile"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent"
 )
 
 func RegisterWebApi(r *gin.Engine, client *ent.Client, ctx context.Context) error {

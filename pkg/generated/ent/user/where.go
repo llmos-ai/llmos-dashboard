@@ -22,7 +22,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/google/uuid"
-	"github.com/llmos/llmos-dashboard/pkg/generated/ent/predicate"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.

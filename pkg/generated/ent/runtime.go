@@ -20,10 +20,10 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/llmos/llmos-dashboard/pkg/generated/ent/chat"
-	"github.com/llmos/llmos-dashboard/pkg/generated/ent/modelfile"
-	"github.com/llmos/llmos-dashboard/pkg/generated/ent/user"
-	v1 "github.com/llmos/llmos-dashboard/pkg/types/v1"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/chat"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/modelfile"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/user"
+	v1 "github.com/llmos-ai/llmos-dashboard/pkg/types/v1"
 )
 
 // The init function reads all schema descriptors with runtime code

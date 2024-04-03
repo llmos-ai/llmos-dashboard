@@ -6,8 +6,8 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 
-	entv1 "github.com/llmos/llmos-dashboard/pkg/generated/ent"
-	"github.com/llmos/llmos-dashboard/pkg/generated/ent/user"
+	entv1 "github.com/llmos-ai/llmos-dashboard/pkg/generated/ent"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/user"
 )
 
 type User struct {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	entv1 "github.com/llmos/llmos-dashboard/pkg/generated/ent"
+	entv1 "github.com/llmos-ai/llmos-dashboard/pkg/generated/ent"
 )
 
 func GetSessionUser(c *gin.Context) (*entv1.User, error) {

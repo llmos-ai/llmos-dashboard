@@ -23,7 +23,7 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
-	"github.com/llmos/llmos-dashboard/pkg/generated/ent/modelfile"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/modelfile"
 )
 
 // Modelfile is the model entity for the Modelfile schema.

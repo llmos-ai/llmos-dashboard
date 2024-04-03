@@ -6,9 +6,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/llmos/llmos-dashboard/pkg/database"
-	"github.com/llmos/llmos-dashboard/pkg/generated/ent"
-	"github.com/llmos/llmos-dashboard/pkg/router"
+	"github.com/llmos-ai/llmos-dashboard/pkg/database"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent"
+	"github.com/llmos-ai/llmos-dashboard/pkg/router"
 )
 
 type ApiServer struct {

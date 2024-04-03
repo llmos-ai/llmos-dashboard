@@ -22,8 +22,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
-	"github.com/llmos/llmos-dashboard/pkg/generated/ent/modelfile"
-	"github.com/llmos/llmos-dashboard/pkg/generated/ent/predicate"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/modelfile"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/predicate"
 )
 
 // ModelfileDelete is the builder for deleting a Modelfile entity.

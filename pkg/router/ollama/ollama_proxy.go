@@ -10,8 +10,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/llmos/llmos-dashboard/pkg/api/auth"
-	"github.com/llmos/llmos-dashboard/pkg/generated/ent"
+	"github.com/llmos-ai/llmos-dashboard/pkg/api/auth"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent"
 )
 
 var defaultTarget = "http://localhost:11434"

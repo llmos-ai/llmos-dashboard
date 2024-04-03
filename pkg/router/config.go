@@ -3,9 +3,9 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 
-	"github.com/llmos/llmos-dashboard/pkg/config"
-	"github.com/llmos/llmos-dashboard/pkg/constant"
-	"github.com/llmos/llmos-dashboard/pkg/version"
+	"github.com/llmos-ai/llmos-dashboard/pkg/config"
+	"github.com/llmos-ai/llmos-dashboard/pkg/constant"
+	"github.com/llmos-ai/llmos-dashboard/pkg/version"
 )
 
 func CORSMiddleware() gin.HandlerFunc {

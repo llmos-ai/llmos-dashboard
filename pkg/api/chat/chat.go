@@ -12,9 +12,9 @@ import (
 	"github.com/google/uuid"
 	_ "github.com/mattn/go-sqlite3"
 
-	entv1 "github.com/llmos/llmos-dashboard/pkg/generated/ent"
-	"github.com/llmos/llmos-dashboard/pkg/generated/ent/chat"
-	"github.com/llmos/llmos-dashboard/pkg/utils"
+	entv1 "github.com/llmos-ai/llmos-dashboard/pkg/generated/ent"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/chat"
+	"github.com/llmos-ai/llmos-dashboard/pkg/utils"
 )
 
 type Handler struct {

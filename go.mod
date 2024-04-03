@@ -1,4 +1,4 @@
-module github.com/llmos/llmos-dashboard
+module github.com/llmos-ai/llmos-dashboard
 
 go 1.21
 
