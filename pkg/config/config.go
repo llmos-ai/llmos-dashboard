@@ -24,11 +24,4 @@ func GetDefaultPromptSuggestions() []PromptSuggestion {
 			Content: "Show me a code snippet of a website's sticky header in CSS and JavaScript.",
 		},
 	}
-
-	//str, err := json.Marshal(suggestions)
-	//if err != nil {
-	//	panic(err)
-	//}
-	//
-	//return string(str)
 }

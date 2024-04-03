@@ -32,6 +32,11 @@ func RegisterWebApi(r *gin.Engine, client *ent.Client, ctx context.Context) erro
 		api.POST("/chats/:id", chatHandler.UpdateChatByID)
 		api.DELETE("/chats/:id", chatHandler.DeleteChatByID)
 		api.GET("/chats/:id/tags", chatHandler.GetChatTagsByID)
+
+		// User API
+		api.GET("/users/", auth.ListAllUser)
+		api.POST("/users/:id/update", auth.UpdateUser)
+		api.POST("/users/update/role", auth.UpdateUserRole)
 	}
 	return nil
 }

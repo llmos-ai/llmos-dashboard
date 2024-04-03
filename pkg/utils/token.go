@@ -5,11 +5,12 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type Claims struct {
-	Username string `json:"username"`
+	UUID uuid.UUID `json:"uuid"`
 	jwt.RegisteredClaims
 }
 
@@ -17,9 +18,9 @@ const issuer = "llmos-issuer"
 
 var jwtKey = []byte("llmos_dashboard_key")
 
-func GenerateToken(username string, time time.Time) (string, error) {
+func GenerateToken(uuid uuid.UUID, time time.Time) (string, error) {
 	claims := Claims{
-		Username: username,
+		UUID: uuid,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time),
 			Issuer:    issuer,

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 
+	"github.com/google/uuid"
 	_ "github.com/mattn/go-sqlite3"
 
 	entv1 "github.com/llmos-ai/llmos-dashboard/pkg/generated/ent"
@@ -51,22 +52,17 @@ func (h *Handler) GetUserByEmail(email string) (*entv1.User, error) {
 	return user, nil
 }
 
-func (h *Handler) GetUserByUsername(username string) (*entv1.User, error) {
+func (h *Handler) GetUserByID(id uuid.UUID) (*entv1.User, error) {
 	slog.Debug("Fetching user record by username ...")
-	user, err := h.client.User.
-		Query().
-		Where(user.Name(username)).
-		// `Only` fails if no user found,
-		// or more than 1 user returned.
-		Only(h.ctx)
+	user, err := h.client.User.Get(h.ctx, id)
 	if err != nil {
-		return nil, fmt.Errorf("failed querying user: %w", err)
+		return nil, err
 	}
-	slog.Debug("user returned: ", h)
+	slog.Debug("user returned: ", user)
 	return user, nil
 }
 
-func (h *Handler) ListUsers() ([]*entv1.User, error) {
+func (h *Handler) GetAllUser() (entv1.Users, error) {
 	users, err := h.client.User.Query().All(h.ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed querying users: %w", err)
@@ -85,4 +81,27 @@ func (h *Handler) DeleteUser(email string) error {
 	}
 	slog.Debug("User deleted successfully", id)
 	return nil
+}
+
+func (h *Handler) UpdateUserRoleByID(id uuid.UUID, role user.Role) (*entv1.User, error) {
+	user, err := h.client.User.UpdateOneID(id).
+		SetRole(role).
+		Save(h.ctx)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+func (h *Handler) UpdateUserByID(id uuid.UUID, u UpdateUser) (*entv1.User, error) {
+	user, err := h.client.User.UpdateOneID(id).
+		SetEmail(u.Email).
+		SetName(u.Name).
+		SetNillablePassword(u.Password).
+		SetProfileImageURL(u.ProfileImageURL).
+		Save(h.ctx)
+	if err != nil {
+		return nil, err
+	}
+	return user, nil
 }
