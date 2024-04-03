@@ -39,12 +39,33 @@ type User struct {
 	// Password holds the value of the "password" field.
 	Password string `json:"password,omitempty"`
 	// Role holds the value of the "role" field.
-	Role string `json:"role,omitempty"`
+	Role user.Role `json:"role,omitempty"`
 	// ProfileImageURL holds the value of the "profile_image_url" field.
 	ProfileImageURL string `json:"profile_image_url,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt    time.Time `json:"created_at,omitempty"`
+	CreatedAt time.Time `json:"created_at,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the UserQuery when eager-loading is set.
+	Edges        UserEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// UserEdges holds the relations/edges for other nodes in the graph.
+type UserEdges struct {
+	// Chats holds the value of the chats edge.
+	Chats []*Chat `json:"chats,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// ChatsOrErr returns the Chats value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) ChatsOrErr() ([]*Chat, error) {
+	if e.loadedTypes[0] {
+		return e.Chats, nil
+	}
+	return nil, &NotLoadedError{edge: "chats"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -101,7 +122,7 @@ func (u *User) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field role", values[i])
 			} else if value.Valid {
-				u.Role = value.String
+				u.Role = user.Role(value.String)
 			}
 		case user.FieldProfileImageURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -126,6 +147,11 @@ func (u *User) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (u *User) Value(name string) (ent.Value, error) {
 	return u.selectValues.Get(name)
+}
+
+// QueryChats queries the "chats" edge of the User entity.
+func (u *User) QueryChats() *ChatQuery {
+	return NewUserClient(u.config).QueryChats(u)
 }
 
 // Update returns a builder for updating this User.
@@ -161,7 +187,7 @@ func (u *User) String() string {
 	builder.WriteString(u.Password)
 	builder.WriteString(", ")
 	builder.WriteString("role=")
-	builder.WriteString(u.Role)
+	builder.WriteString(fmt.Sprintf("%v", u.Role))
 	builder.WriteString(", ")
 	builder.WriteString("profile_image_url=")
 	builder.WriteString(u.ProfileImageURL)

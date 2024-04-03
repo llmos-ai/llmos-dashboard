@@ -23,6 +23,30 @@ import (
 	"github.com/llmos/llmos-dashboard/pkg/generated/ent"
 )
 
+// The ChatFunc type is an adapter to allow the use of ordinary
+// function as Chat mutator.
+type ChatFunc func(context.Context, *ent.ChatMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ChatFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ChatMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ChatMutation", m)
+}
+
+// The ModelfileFunc type is an adapter to allow the use of ordinary
+// function as Modelfile mutator.
+type ModelfileFunc func(context.Context, *ent.ModelfileMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ModelfileFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.ModelfileMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ModelfileMutation", m)
+}
+
 // The UserFunc type is an adapter to allow the use of ordinary
 // function as User mutator.
 type UserFunc func(context.Context, *ent.UserMutation) (ent.Value, error)

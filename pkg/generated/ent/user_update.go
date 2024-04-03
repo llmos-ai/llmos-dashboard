@@ -24,6 +24,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
+	"github.com/llmos/llmos-dashboard/pkg/generated/ent/chat"
 	"github.com/llmos/llmos-dashboard/pkg/generated/ent/predicate"
 	"github.com/llmos/llmos-dashboard/pkg/generated/ent/user"
 )
@@ -84,15 +86,15 @@ func (uu *UserUpdate) SetNillablePassword(s *string) *UserUpdate {
 }
 
 // SetRole sets the "role" field.
-func (uu *UserUpdate) SetRole(s string) *UserUpdate {
-	uu.mutation.SetRole(s)
+func (uu *UserUpdate) SetRole(u user.Role) *UserUpdate {
+	uu.mutation.SetRole(u)
 	return uu
 }
 
 // SetNillableRole sets the "role" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableRole(s *string) *UserUpdate {
-	if s != nil {
-		uu.SetRole(*s)
+func (uu *UserUpdate) SetNillableRole(u *user.Role) *UserUpdate {
+	if u != nil {
+		uu.SetRole(*u)
 	}
 	return uu
 }
@@ -111,9 +113,45 @@ func (uu *UserUpdate) SetNillableProfileImageURL(s *string) *UserUpdate {
 	return uu
 }
 
+// AddChatIDs adds the "chats" edge to the Chat entity by IDs.
+func (uu *UserUpdate) AddChatIDs(ids ...uuid.UUID) *UserUpdate {
+	uu.mutation.AddChatIDs(ids...)
+	return uu
+}
+
+// AddChats adds the "chats" edges to the Chat entity.
+func (uu *UserUpdate) AddChats(c ...*Chat) *UserUpdate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uu.AddChatIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
+}
+
+// ClearChats clears all "chats" edges to the Chat entity.
+func (uu *UserUpdate) ClearChats() *UserUpdate {
+	uu.mutation.ClearChats()
+	return uu
+}
+
+// RemoveChatIDs removes the "chats" edge to Chat entities by IDs.
+func (uu *UserUpdate) RemoveChatIDs(ids ...uuid.UUID) *UserUpdate {
+	uu.mutation.RemoveChatIDs(ids...)
+	return uu
+}
+
+// RemoveChats removes "chats" edges to Chat entities.
+func (uu *UserUpdate) RemoveChats(c ...*Chat) *UserUpdate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uu.RemoveChatIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -190,10 +228,55 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
 	}
 	if value, ok := uu.mutation.Role(); ok {
-		_spec.SetField(user.FieldRole, field.TypeString, value)
+		_spec.SetField(user.FieldRole, field.TypeEnum, value)
 	}
 	if value, ok := uu.mutation.ProfileImageURL(); ok {
 		_spec.SetField(user.FieldProfileImageURL, field.TypeString, value)
+	}
+	if uu.mutation.ChatsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ChatsTable,
+			Columns: []string{user.ChatsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(chat.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedChatsIDs(); len(nodes) > 0 && !uu.mutation.ChatsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ChatsTable,
+			Columns: []string{user.ChatsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(chat.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.ChatsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ChatsTable,
+			Columns: []string{user.ChatsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(chat.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -258,15 +341,15 @@ func (uuo *UserUpdateOne) SetNillablePassword(s *string) *UserUpdateOne {
 }
 
 // SetRole sets the "role" field.
-func (uuo *UserUpdateOne) SetRole(s string) *UserUpdateOne {
-	uuo.mutation.SetRole(s)
+func (uuo *UserUpdateOne) SetRole(u user.Role) *UserUpdateOne {
+	uuo.mutation.SetRole(u)
 	return uuo
 }
 
 // SetNillableRole sets the "role" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableRole(s *string) *UserUpdateOne {
-	if s != nil {
-		uuo.SetRole(*s)
+func (uuo *UserUpdateOne) SetNillableRole(u *user.Role) *UserUpdateOne {
+	if u != nil {
+		uuo.SetRole(*u)
 	}
 	return uuo
 }
@@ -285,9 +368,45 @@ func (uuo *UserUpdateOne) SetNillableProfileImageURL(s *string) *UserUpdateOne {
 	return uuo
 }
 
+// AddChatIDs adds the "chats" edge to the Chat entity by IDs.
+func (uuo *UserUpdateOne) AddChatIDs(ids ...uuid.UUID) *UserUpdateOne {
+	uuo.mutation.AddChatIDs(ids...)
+	return uuo
+}
+
+// AddChats adds the "chats" edges to the Chat entity.
+func (uuo *UserUpdateOne) AddChats(c ...*Chat) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uuo.AddChatIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
+}
+
+// ClearChats clears all "chats" edges to the Chat entity.
+func (uuo *UserUpdateOne) ClearChats() *UserUpdateOne {
+	uuo.mutation.ClearChats()
+	return uuo
+}
+
+// RemoveChatIDs removes the "chats" edge to Chat entities by IDs.
+func (uuo *UserUpdateOne) RemoveChatIDs(ids ...uuid.UUID) *UserUpdateOne {
+	uuo.mutation.RemoveChatIDs(ids...)
+	return uuo
+}
+
+// RemoveChats removes "chats" edges to Chat entities.
+func (uuo *UserUpdateOne) RemoveChats(c ...*Chat) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uuo.RemoveChatIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -394,10 +513,55 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 		_spec.SetField(user.FieldPassword, field.TypeString, value)
 	}
 	if value, ok := uuo.mutation.Role(); ok {
-		_spec.SetField(user.FieldRole, field.TypeString, value)
+		_spec.SetField(user.FieldRole, field.TypeEnum, value)
 	}
 	if value, ok := uuo.mutation.ProfileImageURL(); ok {
 		_spec.SetField(user.FieldProfileImageURL, field.TypeString, value)
+	}
+	if uuo.mutation.ChatsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ChatsTable,
+			Columns: []string{user.ChatsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(chat.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedChatsIDs(); len(nodes) > 0 && !uuo.mutation.ChatsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ChatsTable,
+			Columns: []string{user.ChatsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(chat.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.ChatsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ChatsTable,
+			Columns: []string{user.ChatsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(chat.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &User{config: uuo.config}
 	_spec.Assign = _node.assignValues

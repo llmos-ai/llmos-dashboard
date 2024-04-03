@@ -20,5 +20,11 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// Chat is the predicate function for chat builders.
+type Chat func(*sql.Selector)
+
+// Modelfile is the predicate function for modelfile builders.
+type Modelfile func(*sql.Selector)
+
 // User is the predicate function for user builders.
 type User func(*sql.Selector)

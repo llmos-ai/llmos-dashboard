@@ -1,14 +1,12 @@
 package config
 
-import "encoding/json"
-
 type PromptSuggestion struct {
 	Title   []string `json:"title"`
 	Content string   `json:"content"`
 }
 
-func GetDefaultPromptSuggestions() string {
-	suggestions := []PromptSuggestion{
+func GetDefaultPromptSuggestions() []PromptSuggestion {
+	return []PromptSuggestion{
 		{
 			Title:   []string{"Help me study", "vocabulary for a college entrance exam"},
 			Content: "Help me study vocabulary: write a sentence for me to fill in the blank, and I'll try to pick the correct option.",
@@ -27,10 +25,10 @@ func GetDefaultPromptSuggestions() string {
 		},
 	}
 
-	str, err := json.Marshal(suggestions)
-	if err != nil {
-		panic(err)
-	}
-
-	return string(str)
+	//str, err := json.Marshal(suggestions)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//
+	//return string(str)
 }

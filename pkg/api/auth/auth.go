@@ -20,20 +20,20 @@ type User struct {
 	CreatedAt    string `json:"created_at"`
 }
 
-func (h *Handler) CreateUser(user User) (*entv1.User, error) {
-	slog.Info("Inserting user record ...", user.Email)
+func (h *Handler) CreateUser(user entv1.User) (*entv1.User, error) {
+	slog.Debug("Inserting user record ...", user.Email)
 	createdUser, err := h.client.User.
 		Create().
 		SetName(user.Name).
 		SetEmail(user.Email).
 		SetPassword(user.Password).
 		SetRole(user.Role).
-		SetProfileImageURL(user.ProfileImage).
+		SetProfileImageURL(user.ProfileImageURL).
 		Save(h.ctx)
 	if err != nil {
 		return nil, err
 	}
-	slog.Info("User created successfully", h)
+	slog.Debug("User created successfully", createdUser)
 	return createdUser, nil
 }
 
@@ -66,14 +66,23 @@ func (h *Handler) GetUserByUsername(username string) (*entv1.User, error) {
 	return user, nil
 }
 
+func (h *Handler) ListUsers() ([]*entv1.User, error) {
+	users, err := h.client.User.Query().All(h.ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed querying users: %w", err)
+	}
+	slog.Debug("users returned: ", users)
+	return users, nil
+}
+
 func (h *Handler) DeleteUser(email string) error {
-	slog.Info("Deleting user record ...")
+	slog.Debug("Deleting user record ...", email)
 	id, err := h.client.User.Delete().
 		Where(user.Email(email)).
 		Exec(h.ctx)
 	if err != nil {
 		return err
 	}
-	slog.Info("User deleted successfully", id)
+	slog.Debug("User deleted successfully", id)
 	return nil
 }

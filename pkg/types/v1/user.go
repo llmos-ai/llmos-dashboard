@@ -4,7 +4,9 @@ import (
 	"time"
 
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 	"github.com/google/uuid"
 )
 
@@ -21,7 +23,8 @@ func (User) Fields() []ent.Field {
 		field.String("name").NotEmpty().Unique(),
 		field.String("email").NotEmpty().Unique(),
 		field.String("password").NotEmpty(),
-		field.String("role").Default("pending").NotEmpty(),
+		field.Enum("role").Default("pending").
+			Values("admin", "user", "pending").Default("pending"),
 		field.String("profile_image_url").Default(""),
 		field.Time("created_at").Default(time.Now()).Immutable(),
 	}
@@ -29,5 +32,14 @@ func (User) Fields() []ent.Field {
 
 // Edges of the User.
 func (User) Edges() []ent.Edge {
-	return nil
+	return []ent.Edge{
+		edge.To("chats", Chat.Type),
+	}
+}
+
+func (User) Indexes() []ent.Index {
+	return []ent.Index{
+		index.Fields("name", "email").Unique(),
+		index.Fields("role"),
+	}
 }

@@ -2,6 +2,7 @@ package ollama
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
@@ -15,32 +16,40 @@ import (
 
 var defaultTarget = "http://localhost:11434"
 
-func RegisterOllama(r *gin.Engine, client *ent.Client, ctx context.Context) {
+func RegisterOllama(r *gin.Engine, client *ent.Client, ctx context.Context) error {
 	auth := auth.NewAuthHandler(client, ctx)
 	ollamaApi := r.Group("ollama")
 	ollamaApi.Use(auth.AuthMiddleware)
-	{
-		ollamaApi.GET("/api/tags", ReverseProxy(defaultTarget))
+
+	url, err := url.Parse(defaultTarget)
+	if err != nil {
+		return fmt.Errorf("failed to parse ollama target url: %s", err)
 	}
+
+	{
+		ollamaApi.GET("/api/tags", ReverseProxy(url))
+		ollamaApi.GET("/api/version", ReverseProxy(url))
+		ollamaApi.POST("/api/chat", ReverseProxy(url))
+		ollamaApi.GET("/cancel/:id", CancelRequest)
+	}
+	return nil
 }
 
-func ReverseProxy(target string) gin.HandlerFunc {
-	url, err := url.Parse(target)
-	if err != nil {
-		return func(c *gin.Context) {
-			c.JSON(500, gin.H{"failed to parse target": err.Error()})
-		}
-	}
+func CancelRequest(c *gin.Context) {
+	c.JSON(200, gin.H{"status": true})
+}
+
+func ReverseProxy(url *url.URL) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		director := func(req *http.Request) {
-			//r := c.Request
+		proxy := httputil.NewSingleHostReverseProxy(url)
+		proxy.Director = func(req *http.Request) {
+			req.Header = c.Request.Header
+			req.Host = url.Host
+			req.Header.Set("Origin", "")
 			req.URL.Scheme = url.Scheme
 			req.URL.Host = url.Host
 			req.URL.Path = trimOllamaPrefix(req.URL.Path)
-			//req.Header["Authorization"] = []string{r.Header.Get("Authorization")}
-			//fmt.Printf("director req: %+v", req)
 		}
-		proxy := &httputil.ReverseProxy{Director: director}
 		proxy.ServeHTTP(c.Writer, c.Request)
 	}
 }

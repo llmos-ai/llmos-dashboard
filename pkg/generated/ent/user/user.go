@@ -17,9 +17,11 @@ limitations under the License.
 package user
 
 import (
+	"fmt"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/google/uuid"
 )
 
@@ -40,8 +42,17 @@ const (
 	FieldProfileImageURL = "profile_image_url"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
+	// EdgeChats holds the string denoting the chats edge name in mutations.
+	EdgeChats = "chats"
 	// Table holds the table name of the user in the database.
 	Table = "users"
+	// ChatsTable is the table that holds the chats relation/edge.
+	ChatsTable = "chats"
+	// ChatsInverseTable is the table name for the Chat entity.
+	// It exists in this package in order to avoid circular dependency with the "chat" package.
+	ChatsInverseTable = "chats"
+	// ChatsColumn is the table column denoting the chats relation/edge.
+	ChatsColumn = "user_id"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -72,10 +83,6 @@ var (
 	EmailValidator func(string) error
 	// PasswordValidator is a validator for the "password" field. It is called by the builders before save.
 	PasswordValidator func(string) error
-	// DefaultRole holds the default value on creation for the "role" field.
-	DefaultRole string
-	// RoleValidator is a validator for the "role" field. It is called by the builders before save.
-	RoleValidator func(string) error
 	// DefaultProfileImageURL holds the default value on creation for the "profile_image_url" field.
 	DefaultProfileImageURL string
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
@@ -83,6 +90,33 @@ var (
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
+
+// Role defines the type for the "role" enum field.
+type Role string
+
+// RolePending is the default value of the Role enum.
+const DefaultRole = RolePending
+
+// Role values.
+const (
+	RoleAdmin   Role = "admin"
+	RoleUser    Role = "user"
+	RolePending Role = "pending"
+)
+
+func (r Role) String() string {
+	return string(r)
+}
+
+// RoleValidator is a validator for the "role" field enum values. It is called by the builders before save.
+func RoleValidator(r Role) error {
+	switch r {
+	case RoleAdmin, RoleUser, RolePending:
+		return nil
+	default:
+		return fmt.Errorf("user: invalid enum value for role field: %q", r)
+	}
+}
 
 // OrderOption defines the ordering options for the User queries.
 type OrderOption func(*sql.Selector)
@@ -120,4 +154,25 @@ func ByProfileImageURL(opts ...sql.OrderTermOption) OrderOption {
 // ByCreatedAt orders the results by the created_at field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+}
+
+// ByChatsCount orders the results by chats count.
+func ByChatsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newChatsStep(), opts...)
+	}
+}
+
+// ByChats orders the results by chats terms.
+func ByChats(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newChatsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newChatsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ChatsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ChatsTable, ChatsColumn),
+	)
 }

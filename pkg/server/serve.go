@@ -12,9 +12,8 @@ import (
 )
 
 type ApiServer struct {
-	Context context.Context
-	Engine  *gin.Engine
-	//SqlDB   *sql.DB
+	Context  context.Context
+	Engine   *gin.Engine
 	DBClient *ent.Client
 }
 
@@ -26,9 +25,8 @@ func NewApiServer(ctx context.Context) ApiServer {
 	}
 
 	return ApiServer{
-		Context: ctx,
-		Engine:  gin.Default(),
-		//SqlDB:   sql,
+		Context:  ctx,
+		Engine:   gin.Default(),
 		DBClient: client,
 	}
 }

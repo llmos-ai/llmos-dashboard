@@ -21,8 +21,6 @@ func main() {
 		log.Fatalf("failed reading header: %v", err)
 	}
 
-	//fmt.Println(strinent schema andg(header))
-
 	config := &gen.Config{
 		Header:  string(header),
 		Target:  "./pkg/generated/ent",

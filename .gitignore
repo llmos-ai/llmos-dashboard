@@ -1,6 +1,7 @@
 node_modules
 build
 vendor
-/.svelte-kit
+ui/.svelte-kit
 vite.config.ts.timestamp*
 llmos-ui.db
+webui.db

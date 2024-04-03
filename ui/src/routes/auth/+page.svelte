@@ -28,7 +28,7 @@
 
   const signInHandler = async () => {
     const sessionUser = await userSignIn(email, password).catch((error) => {
-      toast.error(error.error);
+      toast.error(error);
       return null;
     });
 
