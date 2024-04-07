@@ -44,6 +44,8 @@ const (
 	FieldCreatedAt = "created_at"
 	// EdgeChats holds the string denoting the chats edge name in mutations.
 	EdgeChats = "chats"
+	// EdgeModelfiles holds the string denoting the modelfiles edge name in mutations.
+	EdgeModelfiles = "modelfiles"
 	// Table holds the table name of the user in the database.
 	Table = "users"
 	// ChatsTable is the table that holds the chats relation/edge.
@@ -53,6 +55,13 @@ const (
 	ChatsInverseTable = "chats"
 	// ChatsColumn is the table column denoting the chats relation/edge.
 	ChatsColumn = "user_id"
+	// ModelfilesTable is the table that holds the modelfiles relation/edge.
+	ModelfilesTable = "modelfiles"
+	// ModelfilesInverseTable is the table name for the Modelfile entity.
+	// It exists in this package in order to avoid circular dependency with the "modelfile" package.
+	ModelfilesInverseTable = "modelfiles"
+	// ModelfilesColumn is the table column denoting the modelfiles relation/edge.
+	ModelfilesColumn = "user_id"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -169,10 +178,31 @@ func ByChats(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newChatsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByModelfilesCount orders the results by modelfiles count.
+func ByModelfilesCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newModelfilesStep(), opts...)
+	}
+}
+
+// ByModelfiles orders the results by modelfiles terms.
+func ByModelfiles(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newModelfilesStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newChatsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ChatsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, ChatsTable, ChatsColumn),
+	)
+}
+func newModelfilesStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ModelfilesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, ModelfilesTable, ModelfilesColumn),
 	)
 }

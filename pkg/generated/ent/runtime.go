@@ -46,22 +46,24 @@ func init() {
 	chat.DefaultID = chatDescID.Default.(func() uuid.UUID)
 	modelfileFields := v1.Modelfile{}.Fields()
 	_ = modelfileFields
-	// modelfileDescUserID is the schema descriptor for user_id field.
-	modelfileDescUserID := modelfileFields[0].Descriptor()
-	// modelfile.UserIDValidator is a validator for the "user_id" field. It is called by the builders before save.
-	modelfile.UserIDValidator = modelfileDescUserID.Validators[0].(func(int) error)
-	// modelfileDescTagName is the schema descriptor for tag_name field.
+	// modelfileDescTagName is the schema descriptor for tagName field.
 	modelfileDescTagName := modelfileFields[1].Descriptor()
-	// modelfile.TagNameValidator is a validator for the "tag_name" field. It is called by the builders before save.
+	// modelfile.TagNameValidator is a validator for the "tagName" field. It is called by the builders before save.
 	modelfile.TagNameValidator = modelfileDescTagName.Validators[0].(func(string) error)
 	// modelfileDescModelfile is the schema descriptor for modelfile field.
 	modelfileDescModelfile := modelfileFields[2].Descriptor()
 	// modelfile.DefaultModelfile holds the default value on creation for the modelfile field.
 	modelfile.DefaultModelfile = modelfileDescModelfile.Default.(string)
-	// modelfileDescCreatedAt is the schema descriptor for created_at field.
-	modelfileDescCreatedAt := modelfileFields[3].Descriptor()
-	// modelfile.DefaultCreatedAt holds the default value on creation for the created_at field.
+	// modelfile.ModelfileValidator is a validator for the "modelfile" field. It is called by the builders before save.
+	modelfile.ModelfileValidator = modelfileDescModelfile.Validators[0].(func(string) error)
+	// modelfileDescCreatedAt is the schema descriptor for createdAt field.
+	modelfileDescCreatedAt := modelfileFields[4].Descriptor()
+	// modelfile.DefaultCreatedAt holds the default value on creation for the createdAt field.
 	modelfile.DefaultCreatedAt = modelfileDescCreatedAt.Default.(time.Time)
+	// modelfileDescID is the schema descriptor for id field.
+	modelfileDescID := modelfileFields[0].Descriptor()
+	// modelfile.DefaultID holds the default value on creation for the id field.
+	modelfile.DefaultID = modelfileDescID.Default.(func() uuid.UUID)
 	userFields := v1.User{}.Fields()
 	_ = userFields
 	// userDescName is the schema descriptor for name field.

@@ -27,6 +27,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/chat"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/modelfile"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/predicate"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/user"
 )
@@ -34,11 +35,12 @@ import (
 // UserQuery is the builder for querying User entities.
 type UserQuery struct {
 	config
-	ctx        *QueryContext
-	order      []user.OrderOption
-	inters     []Interceptor
-	predicates []predicate.User
-	withChats  *ChatQuery
+	ctx            *QueryContext
+	order          []user.OrderOption
+	inters         []Interceptor
+	predicates     []predicate.User
+	withChats      *ChatQuery
+	withModelfiles *ModelfileQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -90,6 +92,28 @@ func (uq *UserQuery) QueryChats() *ChatQuery {
 			sqlgraph.From(user.Table, user.FieldID, selector),
 			sqlgraph.To(chat.Table, chat.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.ChatsTable, user.ChatsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryModelfiles chains the current query on the "modelfiles" edge.
+func (uq *UserQuery) QueryModelfiles() *ModelfileQuery {
+	query := (&ModelfileClient{config: uq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(modelfile.Table, modelfile.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.ModelfilesTable, user.ModelfilesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
 		return fromU, nil
@@ -284,12 +308,13 @@ func (uq *UserQuery) Clone() *UserQuery {
 		return nil
 	}
 	return &UserQuery{
-		config:     uq.config,
-		ctx:        uq.ctx.Clone(),
-		order:      append([]user.OrderOption{}, uq.order...),
-		inters:     append([]Interceptor{}, uq.inters...),
-		predicates: append([]predicate.User{}, uq.predicates...),
-		withChats:  uq.withChats.Clone(),
+		config:         uq.config,
+		ctx:            uq.ctx.Clone(),
+		order:          append([]user.OrderOption{}, uq.order...),
+		inters:         append([]Interceptor{}, uq.inters...),
+		predicates:     append([]predicate.User{}, uq.predicates...),
+		withChats:      uq.withChats.Clone(),
+		withModelfiles: uq.withModelfiles.Clone(),
 		// clone intermediate query.
 		sql:  uq.sql.Clone(),
 		path: uq.path,
@@ -304,6 +329,17 @@ func (uq *UserQuery) WithChats(opts ...func(*ChatQuery)) *UserQuery {
 		opt(query)
 	}
 	uq.withChats = query
+	return uq
+}
+
+// WithModelfiles tells the query-builder to eager-load the nodes that are connected to
+// the "modelfiles" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithModelfiles(opts ...func(*ModelfileQuery)) *UserQuery {
+	query := (&ModelfileClient{config: uq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withModelfiles = query
 	return uq
 }
 
@@ -385,8 +421,9 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 	var (
 		nodes       = []*User{}
 		_spec       = uq.querySpec()
-		loadedTypes = [1]bool{
+		loadedTypes = [2]bool{
 			uq.withChats != nil,
+			uq.withModelfiles != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -411,6 +448,13 @@ func (uq *UserQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*User, e
 		if err := uq.loadChats(ctx, query, nodes,
 			func(n *User) { n.Edges.Chats = []*Chat{} },
 			func(n *User, e *Chat) { n.Edges.Chats = append(n.Edges.Chats, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := uq.withModelfiles; query != nil {
+		if err := uq.loadModelfiles(ctx, query, nodes,
+			func(n *User) { n.Edges.Modelfiles = []*Modelfile{} },
+			func(n *User, e *Modelfile) { n.Edges.Modelfiles = append(n.Edges.Modelfiles, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -442,6 +486,36 @@ func (uq *UserQuery) loadChats(ctx context.Context, query *ChatQuery, nodes []*U
 		node, ok := nodeids[fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (uq *UserQuery) loadModelfiles(ctx context.Context, query *ModelfileQuery, nodes []*User, init func(*User), assign func(*User, *Modelfile)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[uuid.UUID]*User)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(modelfile.FieldUserId)
+	}
+	query.Where(predicate.Modelfile(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(user.ModelfilesColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.UserId
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "userId" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

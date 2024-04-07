@@ -34,3 +34,12 @@ func GetAPIConfig(c *gin.Context) {
 		"default_prompt_suggestions": config.GetDefaultPromptSuggestions(),
 	})
 }
+
+func GetChangelog(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"status": true,
+		"changelog": []string{
+			"Initial release",
+		},
+	})
+}

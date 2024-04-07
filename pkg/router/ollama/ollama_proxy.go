@@ -27,10 +27,12 @@ func RegisterOllama(r *gin.Engine, client *ent.Client, ctx context.Context) erro
 	}
 
 	{
+		ollamaApi.POST("/api/generate", ReverseProxy(url))
 		ollamaApi.GET("/api/tags", ReverseProxy(url))
 		ollamaApi.GET("/api/version", ReverseProxy(url))
-		ollamaApi.POST("/api/generate", ReverseProxy(url))
 		ollamaApi.POST("/api/chat", ReverseProxy(url))
+		ollamaApi.POST("/api/create", ReverseProxy(url))
+		ollamaApi.DELETE("/api/delete", ReverseProxy(url))
 		ollamaApi.GET("/cancel/:id", CancelRequest)
 	}
 	return nil

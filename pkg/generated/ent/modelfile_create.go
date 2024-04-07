@@ -24,7 +24,9 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/modelfile"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/user"
 )
 
 // ModelfileCreate is the builder for creating a Modelfile entity.
@@ -34,13 +36,7 @@ type ModelfileCreate struct {
 	hooks    []Hook
 }
 
-// SetUserID sets the "user_id" field.
-func (mc *ModelfileCreate) SetUserID(i int) *ModelfileCreate {
-	mc.mutation.SetUserID(i)
-	return mc
-}
-
-// SetTagName sets the "tag_name" field.
+// SetTagName sets the "tagName" field.
 func (mc *ModelfileCreate) SetTagName(s string) *ModelfileCreate {
 	mc.mutation.SetTagName(s)
 	return mc
@@ -60,18 +56,49 @@ func (mc *ModelfileCreate) SetNillableModelfile(s *string) *ModelfileCreate {
 	return mc
 }
 
-// SetCreatedAt sets the "created_at" field.
+// SetUserId sets the "userId" field.
+func (mc *ModelfileCreate) SetUserId(u uuid.UUID) *ModelfileCreate {
+	mc.mutation.SetUserId(u)
+	return mc
+}
+
+// SetCreatedAt sets the "createdAt" field.
 func (mc *ModelfileCreate) SetCreatedAt(t time.Time) *ModelfileCreate {
 	mc.mutation.SetCreatedAt(t)
 	return mc
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
 func (mc *ModelfileCreate) SetNillableCreatedAt(t *time.Time) *ModelfileCreate {
 	if t != nil {
 		mc.SetCreatedAt(*t)
 	}
 	return mc
+}
+
+// SetID sets the "id" field.
+func (mc *ModelfileCreate) SetID(u uuid.UUID) *ModelfileCreate {
+	mc.mutation.SetID(u)
+	return mc
+}
+
+// SetNillableID sets the "id" field if the given value is not nil.
+func (mc *ModelfileCreate) SetNillableID(u *uuid.UUID) *ModelfileCreate {
+	if u != nil {
+		mc.SetID(*u)
+	}
+	return mc
+}
+
+// SetOwnerID sets the "owner" edge to the User entity by ID.
+func (mc *ModelfileCreate) SetOwnerID(id uuid.UUID) *ModelfileCreate {
+	mc.mutation.SetOwnerID(id)
+	return mc
+}
+
+// SetOwner sets the "owner" edge to the User entity.
+func (mc *ModelfileCreate) SetOwner(u *User) *ModelfileCreate {
+	return mc.SetOwnerID(u.ID)
 }
 
 // Mutation returns the ModelfileMutation object of the builder.
@@ -117,31 +144,38 @@ func (mc *ModelfileCreate) defaults() {
 		v := modelfile.DefaultCreatedAt
 		mc.mutation.SetCreatedAt(v)
 	}
+	if _, ok := mc.mutation.ID(); !ok {
+		v := modelfile.DefaultID()
+		mc.mutation.SetID(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (mc *ModelfileCreate) check() error {
-	if _, ok := mc.mutation.UserID(); !ok {
-		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "Modelfile.user_id"`)}
-	}
-	if v, ok := mc.mutation.UserID(); ok {
-		if err := modelfile.UserIDValidator(v); err != nil {
-			return &ValidationError{Name: "user_id", err: fmt.Errorf(`ent: validator failed for field "Modelfile.user_id": %w`, err)}
-		}
-	}
 	if _, ok := mc.mutation.TagName(); !ok {
-		return &ValidationError{Name: "tag_name", err: errors.New(`ent: missing required field "Modelfile.tag_name"`)}
+		return &ValidationError{Name: "tagName", err: errors.New(`ent: missing required field "Modelfile.tagName"`)}
 	}
 	if v, ok := mc.mutation.TagName(); ok {
 		if err := modelfile.TagNameValidator(v); err != nil {
-			return &ValidationError{Name: "tag_name", err: fmt.Errorf(`ent: validator failed for field "Modelfile.tag_name": %w`, err)}
+			return &ValidationError{Name: "tagName", err: fmt.Errorf(`ent: validator failed for field "Modelfile.tagName": %w`, err)}
 		}
 	}
 	if _, ok := mc.mutation.Modelfile(); !ok {
 		return &ValidationError{Name: "modelfile", err: errors.New(`ent: missing required field "Modelfile.modelfile"`)}
 	}
+	if v, ok := mc.mutation.Modelfile(); ok {
+		if err := modelfile.ModelfileValidator(v); err != nil {
+			return &ValidationError{Name: "modelfile", err: fmt.Errorf(`ent: validator failed for field "Modelfile.modelfile": %w`, err)}
+		}
+	}
+	if _, ok := mc.mutation.UserId(); !ok {
+		return &ValidationError{Name: "userId", err: errors.New(`ent: missing required field "Modelfile.userId"`)}
+	}
 	if _, ok := mc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Modelfile.created_at"`)}
+		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "Modelfile.createdAt"`)}
+	}
+	if _, ok := mc.mutation.OwnerID(); !ok {
+		return &ValidationError{Name: "owner", err: errors.New(`ent: missing required edge "Modelfile.owner"`)}
 	}
 	return nil
 }
@@ -157,8 +191,13 @@ func (mc *ModelfileCreate) sqlSave(ctx context.Context) (*Modelfile, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != nil {
+		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+			_node.ID = *id
+		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
+			return nil, err
+		}
+	}
 	mc.mutation.id = &_node.ID
 	mc.mutation.done = true
 	return _node, nil
@@ -167,11 +206,11 @@ func (mc *ModelfileCreate) sqlSave(ctx context.Context) (*Modelfile, error) {
 func (mc *ModelfileCreate) createSpec() (*Modelfile, *sqlgraph.CreateSpec) {
 	var (
 		_node = &Modelfile{config: mc.config}
-		_spec = sqlgraph.NewCreateSpec(modelfile.Table, sqlgraph.NewFieldSpec(modelfile.FieldID, field.TypeInt))
+		_spec = sqlgraph.NewCreateSpec(modelfile.Table, sqlgraph.NewFieldSpec(modelfile.FieldID, field.TypeUUID))
 	)
-	if value, ok := mc.mutation.UserID(); ok {
-		_spec.SetField(modelfile.FieldUserID, field.TypeInt, value)
-		_node.UserID = value
+	if id, ok := mc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = &id
 	}
 	if value, ok := mc.mutation.TagName(); ok {
 		_spec.SetField(modelfile.FieldTagName, field.TypeString, value)
@@ -184,6 +223,23 @@ func (mc *ModelfileCreate) createSpec() (*Modelfile, *sqlgraph.CreateSpec) {
 	if value, ok := mc.mutation.CreatedAt(); ok {
 		_spec.SetField(modelfile.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
+	}
+	if nodes := mc.mutation.OwnerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   modelfile.OwnerTable,
+			Columns: []string{modelfile.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.UserId = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
@@ -233,10 +289,6 @@ func (mcb *ModelfileCreateBulk) Save(ctx context.Context) ([]*Modelfile, error) 
 					return nil, err
 				}
 				mutation.id = &nodes[i].ID
-				if specs[i].ID.Value != nil {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				mutation.done = true
 				return nodes[i], nil
 			})

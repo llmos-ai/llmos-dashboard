@@ -37,7 +37,7 @@ type User struct {
 	// Email holds the value of the "email" field.
 	Email string `json:"email,omitempty"`
 	// Password holds the value of the "password" field.
-	Password string `json:"password,omitempty"`
+	Password string `json:"-"`
 	// Role holds the value of the "role" field.
 	Role user.Role `json:"role,omitempty"`
 	// ProfileImageURL holds the value of the "profile_image_url" field.
@@ -54,9 +54,11 @@ type User struct {
 type UserEdges struct {
 	// Chats holds the value of the chats edge.
 	Chats []*Chat `json:"chats,omitempty"`
+	// Modelfiles holds the value of the modelfiles edge.
+	Modelfiles []*Modelfile `json:"modelfiles,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [1]bool
+	loadedTypes [2]bool
 }
 
 // ChatsOrErr returns the Chats value or an error if the edge
@@ -66,6 +68,15 @@ func (e UserEdges) ChatsOrErr() ([]*Chat, error) {
 		return e.Chats, nil
 	}
 	return nil, &NotLoadedError{edge: "chats"}
+}
+
+// ModelfilesOrErr returns the Modelfiles value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) ModelfilesOrErr() ([]*Modelfile, error) {
+	if e.loadedTypes[1] {
+		return e.Modelfiles, nil
+	}
+	return nil, &NotLoadedError{edge: "modelfiles"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -154,6 +165,11 @@ func (u *User) QueryChats() *ChatQuery {
 	return NewUserClient(u.config).QueryChats(u)
 }
 
+// QueryModelfiles queries the "modelfiles" edge of the User entity.
+func (u *User) QueryModelfiles() *ModelfileQuery {
+	return NewUserClient(u.config).QueryModelfiles(u)
+}
+
 // Update returns a builder for updating this User.
 // Note that you need to call User.Unwrap() before calling this method if this User
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -183,8 +199,7 @@ func (u *User) String() string {
 	builder.WriteString("email=")
 	builder.WriteString(u.Email)
 	builder.WriteString(", ")
-	builder.WriteString("password=")
-	builder.WriteString(u.Password)
+	builder.WriteString("password=<sensitive>")
 	builder.WriteString(", ")
 	builder.WriteString("role=")
 	builder.WriteString(fmt.Sprintf("%v", u.Role))

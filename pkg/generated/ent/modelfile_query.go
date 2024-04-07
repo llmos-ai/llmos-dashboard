@@ -24,8 +24,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/modelfile"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/predicate"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/user"
 )
 
 // ModelfileQuery is the builder for querying Modelfile entities.
@@ -35,6 +37,7 @@ type ModelfileQuery struct {
 	order      []modelfile.OrderOption
 	inters     []Interceptor
 	predicates []predicate.Modelfile
+	withOwner  *UserQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -71,6 +74,28 @@ func (mq *ModelfileQuery) Order(o ...modelfile.OrderOption) *ModelfileQuery {
 	return mq
 }
 
+// QueryOwner chains the current query on the "owner" edge.
+func (mq *ModelfileQuery) QueryOwner() *UserQuery {
+	query := (&UserClient{config: mq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := mq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := mq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(modelfile.Table, modelfile.FieldID, selector),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, modelfile.OwnerTable, modelfile.OwnerColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(mq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // First returns the first Modelfile entity from the query.
 // Returns a *NotFoundError when no Modelfile was found.
 func (mq *ModelfileQuery) First(ctx context.Context) (*Modelfile, error) {
@@ -95,8 +120,8 @@ func (mq *ModelfileQuery) FirstX(ctx context.Context) *Modelfile {
 
 // FirstID returns the first Modelfile ID from the query.
 // Returns a *NotFoundError when no Modelfile ID was found.
-func (mq *ModelfileQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (mq *ModelfileQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = mq.Limit(1).IDs(setContextOp(ctx, mq.ctx, "FirstID")); err != nil {
 		return
 	}
@@ -108,7 +133,7 @@ func (mq *ModelfileQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (mq *ModelfileQuery) FirstIDX(ctx context.Context) int {
+func (mq *ModelfileQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := mq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -146,8 +171,8 @@ func (mq *ModelfileQuery) OnlyX(ctx context.Context) *Modelfile {
 // OnlyID is like Only, but returns the only Modelfile ID in the query.
 // Returns a *NotSingularError when more than one Modelfile ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (mq *ModelfileQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (mq *ModelfileQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = mq.Limit(2).IDs(setContextOp(ctx, mq.ctx, "OnlyID")); err != nil {
 		return
 	}
@@ -163,7 +188,7 @@ func (mq *ModelfileQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (mq *ModelfileQuery) OnlyIDX(ctx context.Context) int {
+func (mq *ModelfileQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := mq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -191,7 +216,7 @@ func (mq *ModelfileQuery) AllX(ctx context.Context) []*Modelfile {
 }
 
 // IDs executes the query and returns a list of Modelfile IDs.
-func (mq *ModelfileQuery) IDs(ctx context.Context) (ids []int, err error) {
+func (mq *ModelfileQuery) IDs(ctx context.Context) (ids []uuid.UUID, err error) {
 	if mq.ctx.Unique == nil && mq.path != nil {
 		mq.Unique(true)
 	}
@@ -203,7 +228,7 @@ func (mq *ModelfileQuery) IDs(ctx context.Context) (ids []int, err error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (mq *ModelfileQuery) IDsX(ctx context.Context) []int {
+func (mq *ModelfileQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := mq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -263,10 +288,22 @@ func (mq *ModelfileQuery) Clone() *ModelfileQuery {
 		order:      append([]modelfile.OrderOption{}, mq.order...),
 		inters:     append([]Interceptor{}, mq.inters...),
 		predicates: append([]predicate.Modelfile{}, mq.predicates...),
+		withOwner:  mq.withOwner.Clone(),
 		// clone intermediate query.
 		sql:  mq.sql.Clone(),
 		path: mq.path,
 	}
+}
+
+// WithOwner tells the query-builder to eager-load the nodes that are connected to
+// the "owner" edge. The optional arguments are used to configure the query builder of the edge.
+func (mq *ModelfileQuery) WithOwner(opts ...func(*UserQuery)) *ModelfileQuery {
+	query := (&UserClient{config: mq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	mq.withOwner = query
+	return mq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -275,12 +312,12 @@ func (mq *ModelfileQuery) Clone() *ModelfileQuery {
 // Example:
 //
 //	var v []struct {
-//		UserID int `json:"user_id,omitempty"`
+//		TagName string `json:"tagName,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Modelfile.Query().
-//		GroupBy(modelfile.FieldUserID).
+//		GroupBy(modelfile.FieldTagName).
 //		Aggregate(ent.Count()).
 //		Scan(ctx, &v)
 func (mq *ModelfileQuery) GroupBy(field string, fields ...string) *ModelfileGroupBy {
@@ -298,11 +335,11 @@ func (mq *ModelfileQuery) GroupBy(field string, fields ...string) *ModelfileGrou
 // Example:
 //
 //	var v []struct {
-//		UserID int `json:"user_id,omitempty"`
+//		TagName string `json:"tagName,omitempty"`
 //	}
 //
 //	client.Modelfile.Query().
-//		Select(modelfile.FieldUserID).
+//		Select(modelfile.FieldTagName).
 //		Scan(ctx, &v)
 func (mq *ModelfileQuery) Select(fields ...string) *ModelfileSelect {
 	mq.ctx.Fields = append(mq.ctx.Fields, fields...)
@@ -345,8 +382,11 @@ func (mq *ModelfileQuery) prepareQuery(ctx context.Context) error {
 
 func (mq *ModelfileQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Modelfile, error) {
 	var (
-		nodes = []*Modelfile{}
-		_spec = mq.querySpec()
+		nodes       = []*Modelfile{}
+		_spec       = mq.querySpec()
+		loadedTypes = [1]bool{
+			mq.withOwner != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Modelfile).scanValues(nil, columns)
@@ -354,6 +394,7 @@ func (mq *ModelfileQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Mo
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Modelfile{config: mq.config}
 		nodes = append(nodes, node)
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -365,7 +406,43 @@ func (mq *ModelfileQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Mo
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+	if query := mq.withOwner; query != nil {
+		if err := mq.loadOwner(ctx, query, nodes, nil,
+			func(n *Modelfile, e *User) { n.Edges.Owner = e }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
+}
+
+func (mq *ModelfileQuery) loadOwner(ctx context.Context, query *UserQuery, nodes []*Modelfile, init func(*Modelfile), assign func(*Modelfile, *User)) error {
+	ids := make([]uuid.UUID, 0, len(nodes))
+	nodeids := make(map[uuid.UUID][]*Modelfile)
+	for i := range nodes {
+		fk := nodes[i].UserId
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(user.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "userId" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
 }
 
 func (mq *ModelfileQuery) sqlCount(ctx context.Context) (int, error) {
@@ -378,7 +455,7 @@ func (mq *ModelfileQuery) sqlCount(ctx context.Context) (int, error) {
 }
 
 func (mq *ModelfileQuery) querySpec() *sqlgraph.QuerySpec {
-	_spec := sqlgraph.NewQuerySpec(modelfile.Table, modelfile.Columns, sqlgraph.NewFieldSpec(modelfile.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewQuerySpec(modelfile.Table, modelfile.Columns, sqlgraph.NewFieldSpec(modelfile.FieldID, field.TypeUUID))
 	_spec.From = mq.sql
 	if unique := mq.ctx.Unique; unique != nil {
 		_spec.Unique = *unique
@@ -392,6 +469,9 @@ func (mq *ModelfileQuery) querySpec() *sqlgraph.QuerySpec {
 			if fields[i] != modelfile.FieldID {
 				_spec.Node.Columns = append(_spec.Node.Columns, fields[i])
 			}
+		}
+		if mq.withOwner != nil {
+			_spec.Node.AddColumnOnce(modelfile.FieldUserId)
 		}
 	}
 	if ps := mq.predicates; len(ps) > 0 {

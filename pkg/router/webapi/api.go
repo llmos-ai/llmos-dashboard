@@ -20,7 +20,6 @@ func RegisterWebApi(r *gin.Engine, client *ent.Client, ctx context.Context) erro
 	modelHandler := modelfile.NewHandler(client, ctx)
 	chatHandler := chat.NewHandler(client, ctx)
 	{
-		api.GET("/modelfiles/", modelHandler.ListModelFile)
 		api.GET("/documents/", ListDocuments)
 		api.GET("/prompts/", ListPrompts)
 
@@ -37,6 +36,13 @@ func RegisterWebApi(r *gin.Engine, client *ent.Client, ctx context.Context) erro
 		api.GET("/users/", auth.ListAllUser)
 		api.POST("/users/:id/update", auth.UpdateUser)
 		api.POST("/users/update/role", auth.UpdateUserRole)
+
+		// Modefile API
+		api.GET("/modelfiles/", modelHandler.ListModelFile)
+		api.POST("/modelfiles/", modelHandler.GetModelFileByTagName)
+		api.POST("/modelfiles/create", modelHandler.CreateModelFile)
+		api.POST("/modelfiles/update", modelHandler.UpdateModelFile)
+		api.DELETE("/modelfiles/:tagName", modelHandler.DeleteModelFile)
 	}
 	return nil
 }

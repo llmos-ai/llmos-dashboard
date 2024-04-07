@@ -20,60 +20,57 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/google/uuid"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/predicate"
 )
 
 // ID filters vertices based on their ID field.
-func ID(id int) predicate.Modelfile {
+func ID(id uuid.UUID) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldEQ(FieldID, id))
 }
 
 // IDEQ applies the EQ predicate on the ID field.
-func IDEQ(id int) predicate.Modelfile {
+func IDEQ(id uuid.UUID) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldEQ(FieldID, id))
 }
 
 // IDNEQ applies the NEQ predicate on the ID field.
-func IDNEQ(id int) predicate.Modelfile {
+func IDNEQ(id uuid.UUID) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldNEQ(FieldID, id))
 }
 
 // IDIn applies the In predicate on the ID field.
-func IDIn(ids ...int) predicate.Modelfile {
+func IDIn(ids ...uuid.UUID) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldIn(FieldID, ids...))
 }
 
 // IDNotIn applies the NotIn predicate on the ID field.
-func IDNotIn(ids ...int) predicate.Modelfile {
+func IDNotIn(ids ...uuid.UUID) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldNotIn(FieldID, ids...))
 }
 
 // IDGT applies the GT predicate on the ID field.
-func IDGT(id int) predicate.Modelfile {
+func IDGT(id uuid.UUID) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldGT(FieldID, id))
 }
 
 // IDGTE applies the GTE predicate on the ID field.
-func IDGTE(id int) predicate.Modelfile {
+func IDGTE(id uuid.UUID) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldGTE(FieldID, id))
 }
 
 // IDLT applies the LT predicate on the ID field.
-func IDLT(id int) predicate.Modelfile {
+func IDLT(id uuid.UUID) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldLT(FieldID, id))
 }
 
 // IDLTE applies the LTE predicate on the ID field.
-func IDLTE(id int) predicate.Modelfile {
+func IDLTE(id uuid.UUID) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldLTE(FieldID, id))
 }
 
-// UserID applies equality check predicate on the "user_id" field. It's identical to UserIDEQ.
-func UserID(v int) predicate.Modelfile {
-	return predicate.Modelfile(sql.FieldEQ(FieldUserID, v))
-}
-
-// TagName applies equality check predicate on the "tag_name" field. It's identical to TagNameEQ.
+// TagName applies equality check predicate on the "tagName" field. It's identical to TagNameEQ.
 func TagName(v string) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldEQ(FieldTagName, v))
 }
@@ -83,112 +80,77 @@ func Modelfile(v string) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldEQ(FieldModelfile, v))
 }
 
-// CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
+// UserId applies equality check predicate on the "userId" field. It's identical to UserIdEQ.
+func UserId(v uuid.UUID) predicate.Modelfile {
+	return predicate.Modelfile(sql.FieldEQ(FieldUserId, v))
+}
+
+// CreatedAt applies equality check predicate on the "createdAt" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldEQ(FieldCreatedAt, v))
 }
 
-// UserIDEQ applies the EQ predicate on the "user_id" field.
-func UserIDEQ(v int) predicate.Modelfile {
-	return predicate.Modelfile(sql.FieldEQ(FieldUserID, v))
-}
-
-// UserIDNEQ applies the NEQ predicate on the "user_id" field.
-func UserIDNEQ(v int) predicate.Modelfile {
-	return predicate.Modelfile(sql.FieldNEQ(FieldUserID, v))
-}
-
-// UserIDIn applies the In predicate on the "user_id" field.
-func UserIDIn(vs ...int) predicate.Modelfile {
-	return predicate.Modelfile(sql.FieldIn(FieldUserID, vs...))
-}
-
-// UserIDNotIn applies the NotIn predicate on the "user_id" field.
-func UserIDNotIn(vs ...int) predicate.Modelfile {
-	return predicate.Modelfile(sql.FieldNotIn(FieldUserID, vs...))
-}
-
-// UserIDGT applies the GT predicate on the "user_id" field.
-func UserIDGT(v int) predicate.Modelfile {
-	return predicate.Modelfile(sql.FieldGT(FieldUserID, v))
-}
-
-// UserIDGTE applies the GTE predicate on the "user_id" field.
-func UserIDGTE(v int) predicate.Modelfile {
-	return predicate.Modelfile(sql.FieldGTE(FieldUserID, v))
-}
-
-// UserIDLT applies the LT predicate on the "user_id" field.
-func UserIDLT(v int) predicate.Modelfile {
-	return predicate.Modelfile(sql.FieldLT(FieldUserID, v))
-}
-
-// UserIDLTE applies the LTE predicate on the "user_id" field.
-func UserIDLTE(v int) predicate.Modelfile {
-	return predicate.Modelfile(sql.FieldLTE(FieldUserID, v))
-}
-
-// TagNameEQ applies the EQ predicate on the "tag_name" field.
+// TagNameEQ applies the EQ predicate on the "tagName" field.
 func TagNameEQ(v string) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldEQ(FieldTagName, v))
 }
 
-// TagNameNEQ applies the NEQ predicate on the "tag_name" field.
+// TagNameNEQ applies the NEQ predicate on the "tagName" field.
 func TagNameNEQ(v string) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldNEQ(FieldTagName, v))
 }
 
-// TagNameIn applies the In predicate on the "tag_name" field.
+// TagNameIn applies the In predicate on the "tagName" field.
 func TagNameIn(vs ...string) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldIn(FieldTagName, vs...))
 }
 
-// TagNameNotIn applies the NotIn predicate on the "tag_name" field.
+// TagNameNotIn applies the NotIn predicate on the "tagName" field.
 func TagNameNotIn(vs ...string) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldNotIn(FieldTagName, vs...))
 }
 
-// TagNameGT applies the GT predicate on the "tag_name" field.
+// TagNameGT applies the GT predicate on the "tagName" field.
 func TagNameGT(v string) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldGT(FieldTagName, v))
 }
 
-// TagNameGTE applies the GTE predicate on the "tag_name" field.
+// TagNameGTE applies the GTE predicate on the "tagName" field.
 func TagNameGTE(v string) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldGTE(FieldTagName, v))
 }
 
-// TagNameLT applies the LT predicate on the "tag_name" field.
+// TagNameLT applies the LT predicate on the "tagName" field.
 func TagNameLT(v string) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldLT(FieldTagName, v))
 }
 
-// TagNameLTE applies the LTE predicate on the "tag_name" field.
+// TagNameLTE applies the LTE predicate on the "tagName" field.
 func TagNameLTE(v string) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldLTE(FieldTagName, v))
 }
 
-// TagNameContains applies the Contains predicate on the "tag_name" field.
+// TagNameContains applies the Contains predicate on the "tagName" field.
 func TagNameContains(v string) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldContains(FieldTagName, v))
 }
 
-// TagNameHasPrefix applies the HasPrefix predicate on the "tag_name" field.
+// TagNameHasPrefix applies the HasPrefix predicate on the "tagName" field.
 func TagNameHasPrefix(v string) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldHasPrefix(FieldTagName, v))
 }
 
-// TagNameHasSuffix applies the HasSuffix predicate on the "tag_name" field.
+// TagNameHasSuffix applies the HasSuffix predicate on the "tagName" field.
 func TagNameHasSuffix(v string) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldHasSuffix(FieldTagName, v))
 }
 
-// TagNameEqualFold applies the EqualFold predicate on the "tag_name" field.
+// TagNameEqualFold applies the EqualFold predicate on the "tagName" field.
 func TagNameEqualFold(v string) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldEqualFold(FieldTagName, v))
 }
 
-// TagNameContainsFold applies the ContainsFold predicate on the "tag_name" field.
+// TagNameContainsFold applies the ContainsFold predicate on the "tagName" field.
 func TagNameContainsFold(v string) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldContainsFold(FieldTagName, v))
 }
@@ -258,44 +220,87 @@ func ModelfileContainsFold(v string) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldContainsFold(FieldModelfile, v))
 }
 
-// CreatedAtEQ applies the EQ predicate on the "created_at" field.
+// UserIdEQ applies the EQ predicate on the "userId" field.
+func UserIdEQ(v uuid.UUID) predicate.Modelfile {
+	return predicate.Modelfile(sql.FieldEQ(FieldUserId, v))
+}
+
+// UserIdNEQ applies the NEQ predicate on the "userId" field.
+func UserIdNEQ(v uuid.UUID) predicate.Modelfile {
+	return predicate.Modelfile(sql.FieldNEQ(FieldUserId, v))
+}
+
+// UserIdIn applies the In predicate on the "userId" field.
+func UserIdIn(vs ...uuid.UUID) predicate.Modelfile {
+	return predicate.Modelfile(sql.FieldIn(FieldUserId, vs...))
+}
+
+// UserIdNotIn applies the NotIn predicate on the "userId" field.
+func UserIdNotIn(vs ...uuid.UUID) predicate.Modelfile {
+	return predicate.Modelfile(sql.FieldNotIn(FieldUserId, vs...))
+}
+
+// CreatedAtEQ applies the EQ predicate on the "createdAt" field.
 func CreatedAtEQ(v time.Time) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldEQ(FieldCreatedAt, v))
 }
 
-// CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
+// CreatedAtNEQ applies the NEQ predicate on the "createdAt" field.
 func CreatedAtNEQ(v time.Time) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldNEQ(FieldCreatedAt, v))
 }
 
-// CreatedAtIn applies the In predicate on the "created_at" field.
+// CreatedAtIn applies the In predicate on the "createdAt" field.
 func CreatedAtIn(vs ...time.Time) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldIn(FieldCreatedAt, vs...))
 }
 
-// CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
+// CreatedAtNotIn applies the NotIn predicate on the "createdAt" field.
 func CreatedAtNotIn(vs ...time.Time) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldNotIn(FieldCreatedAt, vs...))
 }
 
-// CreatedAtGT applies the GT predicate on the "created_at" field.
+// CreatedAtGT applies the GT predicate on the "createdAt" field.
 func CreatedAtGT(v time.Time) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldGT(FieldCreatedAt, v))
 }
 
-// CreatedAtGTE applies the GTE predicate on the "created_at" field.
+// CreatedAtGTE applies the GTE predicate on the "createdAt" field.
 func CreatedAtGTE(v time.Time) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldGTE(FieldCreatedAt, v))
 }
 
-// CreatedAtLT applies the LT predicate on the "created_at" field.
+// CreatedAtLT applies the LT predicate on the "createdAt" field.
 func CreatedAtLT(v time.Time) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldLT(FieldCreatedAt, v))
 }
 
-// CreatedAtLTE applies the LTE predicate on the "created_at" field.
+// CreatedAtLTE applies the LTE predicate on the "createdAt" field.
 func CreatedAtLTE(v time.Time) predicate.Modelfile {
 	return predicate.Modelfile(sql.FieldLTE(FieldCreatedAt, v))
+}
+
+// HasOwner applies the HasEdge predicate on the "owner" edge.
+func HasOwner() predicate.Modelfile {
+	return predicate.Modelfile(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, OwnerTable, OwnerColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasOwnerWith applies the HasEdge predicate on the "owner" edge with a given conditions (other predicates).
+func HasOwnerWith(preds ...predicate.User) predicate.Modelfile {
+	return predicate.Modelfile(func(s *sql.Selector) {
+		step := newOwnerStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

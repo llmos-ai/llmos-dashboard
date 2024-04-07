@@ -20,6 +20,8 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
+	"github.com/google/uuid"
 )
 
 const (
@@ -27,24 +29,33 @@ const (
 	Label = "modelfile"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldUserID holds the string denoting the user_id field in the database.
-	FieldUserID = "user_id"
-	// FieldTagName holds the string denoting the tag_name field in the database.
+	// FieldTagName holds the string denoting the tagname field in the database.
 	FieldTagName = "tag_name"
 	// FieldModelfile holds the string denoting the modelfile field in the database.
 	FieldModelfile = "modelfile"
-	// FieldCreatedAt holds the string denoting the created_at field in the database.
+	// FieldUserId holds the string denoting the userid field in the database.
+	FieldUserId = "user_id"
+	// FieldCreatedAt holds the string denoting the createdat field in the database.
 	FieldCreatedAt = "created_at"
+	// EdgeOwner holds the string denoting the owner edge name in mutations.
+	EdgeOwner = "owner"
 	// Table holds the table name of the modelfile in the database.
 	Table = "modelfiles"
+	// OwnerTable is the table that holds the owner relation/edge.
+	OwnerTable = "modelfiles"
+	// OwnerInverseTable is the table name for the User entity.
+	// It exists in this package in order to avoid circular dependency with the "user" package.
+	OwnerInverseTable = "users"
+	// OwnerColumn is the table column denoting the owner relation/edge.
+	OwnerColumn = "user_id"
 )
 
 // Columns holds all SQL columns for modelfile fields.
 var Columns = []string{
 	FieldID,
-	FieldUserID,
 	FieldTagName,
 	FieldModelfile,
+	FieldUserId,
 	FieldCreatedAt,
 }
 
@@ -59,14 +70,16 @@ func ValidColumn(column string) bool {
 }
 
 var (
-	// UserIDValidator is a validator for the "user_id" field. It is called by the builders before save.
-	UserIDValidator func(int) error
-	// TagNameValidator is a validator for the "tag_name" field. It is called by the builders before save.
+	// TagNameValidator is a validator for the "tagName" field. It is called by the builders before save.
 	TagNameValidator func(string) error
 	// DefaultModelfile holds the default value on creation for the "modelfile" field.
 	DefaultModelfile string
-	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
+	// ModelfileValidator is a validator for the "modelfile" field. It is called by the builders before save.
+	ModelfileValidator func(string) error
+	// DefaultCreatedAt holds the default value on creation for the "createdAt" field.
 	DefaultCreatedAt time.Time
+	// DefaultID holds the default value on creation for the "id" field.
+	DefaultID func() uuid.UUID
 )
 
 // OrderOption defines the ordering options for the Modelfile queries.
@@ -77,12 +90,7 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByUserID orders the results by the user_id field.
-func ByUserID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUserID, opts...).ToFunc()
-}
-
-// ByTagName orders the results by the tag_name field.
+// ByTagName orders the results by the tagName field.
 func ByTagName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTagName, opts...).ToFunc()
 }
@@ -92,7 +100,26 @@ func ByModelfile(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldModelfile, opts...).ToFunc()
 }
 
-// ByCreatedAt orders the results by the created_at field.
+// ByUserId orders the results by the userId field.
+func ByUserId(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUserId, opts...).ToFunc()
+}
+
+// ByCreatedAt orders the results by the createdAt field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+}
+
+// ByOwnerField orders the results by owner field.
+func ByOwnerField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newOwnerStep(), sql.OrderByField(field, opts...))
+	}
+}
+func newOwnerStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(OwnerInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, OwnerTable, OwnerColumn),
+	)
 }

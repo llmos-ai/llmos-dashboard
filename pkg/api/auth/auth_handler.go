@@ -19,14 +19,14 @@ import (
 
 const tokenType = "Bearer"
 
-type Login struct {
+type LoginRequest struct {
 	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
 type SingUp struct {
 	Name string `json:"name" binding:"required"`
-	Login
+	LoginRequest
 }
 
 type UpdateRole struct {
@@ -54,7 +54,7 @@ func NewAuthHandler(c *entv1.Client, ctx context.Context) Handler {
 }
 
 func (h *Handler) SignIn(c *gin.Context) {
-	var l Login
+	var l LoginRequest
 	if err := c.ShouldBindJSON(&l); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return

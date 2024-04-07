@@ -26,6 +26,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/chat"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/modelfile"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/predicate"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/user"
 )
@@ -128,6 +129,21 @@ func (uu *UserUpdate) AddChats(c ...*Chat) *UserUpdate {
 	return uu.AddChatIDs(ids...)
 }
 
+// AddModelfileIDs adds the "modelfiles" edge to the Modelfile entity by IDs.
+func (uu *UserUpdate) AddModelfileIDs(ids ...uuid.UUID) *UserUpdate {
+	uu.mutation.AddModelfileIDs(ids...)
+	return uu
+}
+
+// AddModelfiles adds the "modelfiles" edges to the Modelfile entity.
+func (uu *UserUpdate) AddModelfiles(m ...*Modelfile) *UserUpdate {
+	ids := make([]uuid.UUID, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return uu.AddModelfileIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
@@ -152,6 +168,27 @@ func (uu *UserUpdate) RemoveChats(c ...*Chat) *UserUpdate {
 		ids[i] = c[i].ID
 	}
 	return uu.RemoveChatIDs(ids...)
+}
+
+// ClearModelfiles clears all "modelfiles" edges to the Modelfile entity.
+func (uu *UserUpdate) ClearModelfiles() *UserUpdate {
+	uu.mutation.ClearModelfiles()
+	return uu
+}
+
+// RemoveModelfileIDs removes the "modelfiles" edge to Modelfile entities by IDs.
+func (uu *UserUpdate) RemoveModelfileIDs(ids ...uuid.UUID) *UserUpdate {
+	uu.mutation.RemoveModelfileIDs(ids...)
+	return uu
+}
+
+// RemoveModelfiles removes "modelfiles" edges to Modelfile entities.
+func (uu *UserUpdate) RemoveModelfiles(m ...*Modelfile) *UserUpdate {
+	ids := make([]uuid.UUID, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return uu.RemoveModelfileIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -278,6 +315,51 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if uu.mutation.ModelfilesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ModelfilesTable,
+			Columns: []string{user.ModelfilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(modelfile.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedModelfilesIDs(); len(nodes) > 0 && !uu.mutation.ModelfilesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ModelfilesTable,
+			Columns: []string{user.ModelfilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(modelfile.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.ModelfilesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ModelfilesTable,
+			Columns: []string{user.ModelfilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(modelfile.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -383,6 +465,21 @@ func (uuo *UserUpdateOne) AddChats(c ...*Chat) *UserUpdateOne {
 	return uuo.AddChatIDs(ids...)
 }
 
+// AddModelfileIDs adds the "modelfiles" edge to the Modelfile entity by IDs.
+func (uuo *UserUpdateOne) AddModelfileIDs(ids ...uuid.UUID) *UserUpdateOne {
+	uuo.mutation.AddModelfileIDs(ids...)
+	return uuo
+}
+
+// AddModelfiles adds the "modelfiles" edges to the Modelfile entity.
+func (uuo *UserUpdateOne) AddModelfiles(m ...*Modelfile) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return uuo.AddModelfileIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
@@ -407,6 +504,27 @@ func (uuo *UserUpdateOne) RemoveChats(c ...*Chat) *UserUpdateOne {
 		ids[i] = c[i].ID
 	}
 	return uuo.RemoveChatIDs(ids...)
+}
+
+// ClearModelfiles clears all "modelfiles" edges to the Modelfile entity.
+func (uuo *UserUpdateOne) ClearModelfiles() *UserUpdateOne {
+	uuo.mutation.ClearModelfiles()
+	return uuo
+}
+
+// RemoveModelfileIDs removes the "modelfiles" edge to Modelfile entities by IDs.
+func (uuo *UserUpdateOne) RemoveModelfileIDs(ids ...uuid.UUID) *UserUpdateOne {
+	uuo.mutation.RemoveModelfileIDs(ids...)
+	return uuo
+}
+
+// RemoveModelfiles removes "modelfiles" edges to Modelfile entities.
+func (uuo *UserUpdateOne) RemoveModelfiles(m ...*Modelfile) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return uuo.RemoveModelfileIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -556,6 +674,51 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(chat.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.ModelfilesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ModelfilesTable,
+			Columns: []string{user.ModelfilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(modelfile.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedModelfilesIDs(); len(nodes) > 0 && !uuo.mutation.ModelfilesCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ModelfilesTable,
+			Columns: []string{user.ModelfilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(modelfile.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.ModelfilesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ModelfilesTable,
+			Columns: []string{user.ModelfilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(modelfile.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
