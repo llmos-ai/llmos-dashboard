@@ -11,7 +11,6 @@
   import { getModelfiles } from "$lib/apis/modelfiles";
   import { getPrompts } from "$lib/apis/prompts";
   import { getOpenAIModels } from "$lib/apis/openai";
-  import { getLiteLLMModels } from "$lib/apis/litellm";
   import { getDocs } from "$lib/apis/documents";
   import { getAllChatTags } from "$lib/apis/chats";
 
@@ -53,10 +52,6 @@
         return null;
       }),
       await getOpenAIModels(localStorage.token).catch((error) => {
-        console.log(error);
-        return null;
-      }),
-      await getLiteLLMModels(localStorage.token).catch((error) => {
         console.log(error);
         return null;
       }),
@@ -254,12 +249,12 @@
               <div
                 class="text-center dark:text-white text-2xl font-medium z-50"
               >
-                Account Activation Pending<br /> Contact Admin for WebUI Access
+                Account Activation Pending<br /> Contact Admin for Dashboard Access
               </div>
 
               <div class=" mt-4 text-center text-sm dark:text-gray-200 w-full">
                 Your account status is currently pending activation. To access
-                the WebUI, please reach out to the administrator. Admins can
+                the dashboard, please reach out to the administrator. Admins can
                 manage user statuses from the Admin Panel.
               </div>
 

@@ -472,7 +472,7 @@ func (uq *UserQuery) loadChats(ctx context.Context, query *ChatQuery, nodes []*U
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(chat.FieldUserID)
+		query.ctx.AppendFieldOnce(chat.FieldUserId)
 	}
 	query.Where(predicate.Chat(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(user.ChatsColumn), fks...))
@@ -482,10 +482,10 @@ func (uq *UserQuery) loadChats(ctx context.Context, query *ChatQuery, nodes []*U
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.UserID
+		fk := n.UserId
 		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "user_id" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "userId" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

@@ -37,7 +37,7 @@
 
   onMount(() => {
     name = $user.name;
-    profileImageUrl = $user.profile_image_url;
+    profileImageUrl = $user.profileImageUrl;
   });
 </script>
 

@@ -26,7 +26,10 @@ var (
 	ChatsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
 		{Name: "title", Type: field.TypeString},
-		{Name: "chat", Type: field.TypeString},
+		{Name: "models", Type: field.TypeJSON},
+		{Name: "tags", Type: field.TypeJSON},
+		{Name: "history", Type: field.TypeJSON},
+		{Name: "messages", Type: field.TypeJSON},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "user_id", Type: field.TypeUUID},
 	}
@@ -38,7 +41,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "chats_users_chats",
-				Columns:    []*schema.Column{ChatsColumns[4]},
+				Columns:    []*schema.Column{ChatsColumns[7]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -47,7 +50,7 @@ var (
 			{
 				Name:    "chat_user_id",
 				Unique:  false,
-				Columns: []*schema.Column{ChatsColumns[4]},
+				Columns: []*schema.Column{ChatsColumns[7]},
 			},
 		},
 	}

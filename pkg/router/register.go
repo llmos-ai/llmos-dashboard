@@ -7,7 +7,6 @@ import (
 
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent"
 	"github.com/llmos-ai/llmos-dashboard/pkg/router/auth"
-	"github.com/llmos-ai/llmos-dashboard/pkg/router/litellm"
 	"github.com/llmos-ai/llmos-dashboard/pkg/router/ollama"
 	"github.com/llmos-ai/llmos-dashboard/pkg/router/openai"
 	"github.com/llmos-ai/llmos-dashboard/pkg/router/webapi"
@@ -17,7 +16,6 @@ type RegisterRouter func(*gin.Engine, *ent.Client, context.Context) error
 
 var registeredRouters = []RegisterRouter{
 	auth.RegisterAuthRoute,
-	litellm.RegisterLiteLLM,
 	openai.RegisterLiteLLM,
 	webapi.RegisterWebApi,
 	ollama.RegisterOllama,

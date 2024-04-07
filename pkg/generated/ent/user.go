@@ -40,10 +40,10 @@ type User struct {
 	Password string `json:"-"`
 	// Role holds the value of the "role" field.
 	Role user.Role `json:"role,omitempty"`
-	// ProfileImageURL holds the value of the "profile_image_url" field.
-	ProfileImageURL string `json:"profile_image_url,omitempty"`
-	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	// ProfileImageUrl holds the value of the "profileImageUrl" field.
+	ProfileImageUrl string `json:"profileImageUrl,omitempty"`
+	// CreatedAt holds the value of the "createdAt" field.
+	CreatedAt time.Time `json:"createdAt,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the UserQuery when eager-loading is set.
 	Edges        UserEdges `json:"edges"`
@@ -84,7 +84,7 @@ func (*User) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case user.FieldName, user.FieldEmail, user.FieldPassword, user.FieldRole, user.FieldProfileImageURL:
+		case user.FieldName, user.FieldEmail, user.FieldPassword, user.FieldRole, user.FieldProfileImageUrl:
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
@@ -135,15 +135,15 @@ func (u *User) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				u.Role = user.Role(value.String)
 			}
-		case user.FieldProfileImageURL:
+		case user.FieldProfileImageUrl:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field profile_image_url", values[i])
+				return fmt.Errorf("unexpected type %T for field profileImageUrl", values[i])
 			} else if value.Valid {
-				u.ProfileImageURL = value.String
+				u.ProfileImageUrl = value.String
 			}
 		case user.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+				return fmt.Errorf("unexpected type %T for field createdAt", values[i])
 			} else if value.Valid {
 				u.CreatedAt = value.Time
 			}
@@ -204,10 +204,10 @@ func (u *User) String() string {
 	builder.WriteString("role=")
 	builder.WriteString(fmt.Sprintf("%v", u.Role))
 	builder.WriteString(", ")
-	builder.WriteString("profile_image_url=")
-	builder.WriteString(u.ProfileImageURL)
+	builder.WriteString("profileImageUrl=")
+	builder.WriteString(u.ProfileImageUrl)
 	builder.WriteString(", ")
-	builder.WriteString("created_at=")
+	builder.WriteString("createdAt=")
 	builder.WriteString(u.CreatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()

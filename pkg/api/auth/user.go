@@ -17,8 +17,8 @@ type User struct {
 	Email        string `json:"email"`
 	Password     string `json:"password"`
 	Role         string `json:"role"`
-	ProfileImage string `json:"profile_image_url"`
-	CreatedAt    string `json:"created_at"`
+	ProfileImage string `json:"profileImageUrl"`
+	CreatedAt    string `json:"createdAt"`
 }
 
 func (h *Handler) CreateUser(user entv1.User) (*entv1.User, error) {
@@ -29,7 +29,7 @@ func (h *Handler) CreateUser(user entv1.User) (*entv1.User, error) {
 		SetEmail(user.Email).
 		SetPassword(user.Password).
 		SetRole(user.Role).
-		SetProfileImageURL(user.ProfileImageURL).
+		SetProfileImageUrl(user.ProfileImageUrl).
 		Save(h.ctx)
 	if err != nil {
 		return nil, err
@@ -98,7 +98,7 @@ func (h *Handler) UpdateUserByID(id uuid.UUID, u UpdateUser) (*entv1.User, error
 		SetEmail(u.Email).
 		SetName(u.Name).
 		SetNillablePassword(u.Password).
-		SetProfileImageURL(u.ProfileImageURL).
+		SetProfileImageUrl(u.ProfileImageUrl).
 		Save(h.ctx)
 	if err != nil {
 		return nil, err

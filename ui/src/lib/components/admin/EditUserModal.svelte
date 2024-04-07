@@ -15,7 +15,7 @@
   export let sessionUser;
 
   let _user = {
-    profile_image_url: "",
+    profileImageUrl: "",
     name: "",
     email: "",
     password: "",
@@ -83,7 +83,7 @@
           <div class=" flex items-center rounded-md py-2 px-4 w-full">
             <div class=" self-center mr-5">
               <img
-                src={selectedUser.profile_image_url}
+                src={selectedUser.profileImageUrl}
                 class=" max-w-[55px] object-cover rounded-full"
                 alt="User profile"
               />

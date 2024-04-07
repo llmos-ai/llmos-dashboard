@@ -30,6 +30,7 @@ import (
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/modelfile"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/predicate"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/user"
+	v1 "github.com/llmos-ai/llmos-dashboard/pkg/types/v1"
 )
 
 const (
@@ -49,18 +50,24 @@ const (
 // ChatMutation represents an operation that mutates the Chat nodes in the graph.
 type ChatMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *uuid.UUID
-	title         *string
-	chat          *string
-	created_at    *time.Time
-	clearedFields map[string]struct{}
-	owner         *uuid.UUID
-	clearedowner  bool
-	done          bool
-	oldValue      func(context.Context) (*Chat, error)
-	predicates    []predicate.Chat
+	op             Op
+	typ            string
+	id             *uuid.UUID
+	title          *string
+	models         *[]string
+	appendmodels   []string
+	tags           *[]string
+	appendtags     []string
+	history        *v1.Histroy
+	messages       *[]v1.Message
+	appendmessages []v1.Message
+	createdAt      *time.Time
+	clearedFields  map[string]struct{}
+	owner          *uuid.UUID
+	clearedowner   bool
+	done           bool
+	oldValue       func(context.Context) (*Chat, error)
+	predicates     []predicate.Chat
 }
 
 var _ ent.Mutation = (*ChatMutation)(nil)
@@ -203,13 +210,13 @@ func (m *ChatMutation) ResetTitle() {
 	m.title = nil
 }
 
-// SetUserID sets the "user_id" field.
-func (m *ChatMutation) SetUserID(u uuid.UUID) {
+// SetUserId sets the "userId" field.
+func (m *ChatMutation) SetUserId(u uuid.UUID) {
 	m.owner = &u
 }
 
-// UserID returns the value of the "user_id" field in the mutation.
-func (m *ChatMutation) UserID() (r uuid.UUID, exists bool) {
+// UserId returns the value of the "userId" field in the mutation.
+func (m *ChatMutation) UserId() (r uuid.UUID, exists bool) {
 	v := m.owner
 	if v == nil {
 		return
@@ -217,79 +224,232 @@ func (m *ChatMutation) UserID() (r uuid.UUID, exists bool) {
 	return *v, true
 }
 
-// OldUserID returns the old "user_id" field's value of the Chat entity.
+// OldUserId returns the old "userId" field's value of the Chat entity.
 // If the Chat object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ChatMutation) OldUserID(ctx context.Context) (v uuid.UUID, err error) {
+func (m *ChatMutation) OldUserId(ctx context.Context) (v uuid.UUID, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUserID is only allowed on UpdateOne operations")
+		return v, errors.New("OldUserId is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUserID requires an ID field in the mutation")
+		return v, errors.New("OldUserId requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUserID: %w", err)
+		return v, fmt.Errorf("querying old value for OldUserId: %w", err)
 	}
-	return oldValue.UserID, nil
+	return oldValue.UserId, nil
 }
 
-// ResetUserID resets all changes to the "user_id" field.
-func (m *ChatMutation) ResetUserID() {
+// ResetUserId resets all changes to the "userId" field.
+func (m *ChatMutation) ResetUserId() {
 	m.owner = nil
 }
 
-// SetChat sets the "chat" field.
-func (m *ChatMutation) SetChat(s string) {
-	m.chat = &s
+// SetModels sets the "models" field.
+func (m *ChatMutation) SetModels(s []string) {
+	m.models = &s
+	m.appendmodels = nil
 }
 
-// Chat returns the value of the "chat" field in the mutation.
-func (m *ChatMutation) Chat() (r string, exists bool) {
-	v := m.chat
+// Models returns the value of the "models" field in the mutation.
+func (m *ChatMutation) Models() (r []string, exists bool) {
+	v := m.models
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldChat returns the old "chat" field's value of the Chat entity.
+// OldModels returns the old "models" field's value of the Chat entity.
 // If the Chat object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ChatMutation) OldChat(ctx context.Context) (v string, err error) {
+func (m *ChatMutation) OldModels(ctx context.Context) (v []string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldChat is only allowed on UpdateOne operations")
+		return v, errors.New("OldModels is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldChat requires an ID field in the mutation")
+		return v, errors.New("OldModels requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldChat: %w", err)
+		return v, fmt.Errorf("querying old value for OldModels: %w", err)
 	}
-	return oldValue.Chat, nil
+	return oldValue.Models, nil
 }
 
-// ResetChat resets all changes to the "chat" field.
-func (m *ChatMutation) ResetChat() {
-	m.chat = nil
+// AppendModels adds s to the "models" field.
+func (m *ChatMutation) AppendModels(s []string) {
+	m.appendmodels = append(m.appendmodels, s...)
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (m *ChatMutation) SetCreatedAt(t time.Time) {
-	m.created_at = &t
+// AppendedModels returns the list of values that were appended to the "models" field in this mutation.
+func (m *ChatMutation) AppendedModels() ([]string, bool) {
+	if len(m.appendmodels) == 0 {
+		return nil, false
+	}
+	return m.appendmodels, true
 }
 
-// CreatedAt returns the value of the "created_at" field in the mutation.
-func (m *ChatMutation) CreatedAt() (r time.Time, exists bool) {
-	v := m.created_at
+// ResetModels resets all changes to the "models" field.
+func (m *ChatMutation) ResetModels() {
+	m.models = nil
+	m.appendmodels = nil
+}
+
+// SetTags sets the "tags" field.
+func (m *ChatMutation) SetTags(s []string) {
+	m.tags = &s
+	m.appendtags = nil
+}
+
+// Tags returns the value of the "tags" field in the mutation.
+func (m *ChatMutation) Tags() (r []string, exists bool) {
+	v := m.tags
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldCreatedAt returns the old "created_at" field's value of the Chat entity.
+// OldTags returns the old "tags" field's value of the Chat entity.
+// If the Chat object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChatMutation) OldTags(ctx context.Context) (v []string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTags is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTags requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTags: %w", err)
+	}
+	return oldValue.Tags, nil
+}
+
+// AppendTags adds s to the "tags" field.
+func (m *ChatMutation) AppendTags(s []string) {
+	m.appendtags = append(m.appendtags, s...)
+}
+
+// AppendedTags returns the list of values that were appended to the "tags" field in this mutation.
+func (m *ChatMutation) AppendedTags() ([]string, bool) {
+	if len(m.appendtags) == 0 {
+		return nil, false
+	}
+	return m.appendtags, true
+}
+
+// ResetTags resets all changes to the "tags" field.
+func (m *ChatMutation) ResetTags() {
+	m.tags = nil
+	m.appendtags = nil
+}
+
+// SetHistory sets the "history" field.
+func (m *ChatMutation) SetHistory(v v1.Histroy) {
+	m.history = &v
+}
+
+// History returns the value of the "history" field in the mutation.
+func (m *ChatMutation) History() (r v1.Histroy, exists bool) {
+	v := m.history
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldHistory returns the old "history" field's value of the Chat entity.
+// If the Chat object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChatMutation) OldHistory(ctx context.Context) (v v1.Histroy, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldHistory is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldHistory requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldHistory: %w", err)
+	}
+	return oldValue.History, nil
+}
+
+// ResetHistory resets all changes to the "history" field.
+func (m *ChatMutation) ResetHistory() {
+	m.history = nil
+}
+
+// SetMessages sets the "messages" field.
+func (m *ChatMutation) SetMessages(v []v1.Message) {
+	m.messages = &v
+	m.appendmessages = nil
+}
+
+// Messages returns the value of the "messages" field in the mutation.
+func (m *ChatMutation) Messages() (r []v1.Message, exists bool) {
+	v := m.messages
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldMessages returns the old "messages" field's value of the Chat entity.
+// If the Chat object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ChatMutation) OldMessages(ctx context.Context) (v []v1.Message, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldMessages is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldMessages requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldMessages: %w", err)
+	}
+	return oldValue.Messages, nil
+}
+
+// AppendMessages adds v to the "messages" field.
+func (m *ChatMutation) AppendMessages(v []v1.Message) {
+	m.appendmessages = append(m.appendmessages, v...)
+}
+
+// AppendedMessages returns the list of values that were appended to the "messages" field in this mutation.
+func (m *ChatMutation) AppendedMessages() ([]v1.Message, bool) {
+	if len(m.appendmessages) == 0 {
+		return nil, false
+	}
+	return m.appendmessages, true
+}
+
+// ResetMessages resets all changes to the "messages" field.
+func (m *ChatMutation) ResetMessages() {
+	m.messages = nil
+	m.appendmessages = nil
+}
+
+// SetCreatedAt sets the "createdAt" field.
+func (m *ChatMutation) SetCreatedAt(t time.Time) {
+	m.createdAt = &t
+}
+
+// CreatedAt returns the value of the "createdAt" field in the mutation.
+func (m *ChatMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.createdAt
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "createdAt" field's value of the Chat entity.
 // If the Chat object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *ChatMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
@@ -306,9 +466,9 @@ func (m *ChatMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error
 	return oldValue.CreatedAt, nil
 }
 
-// ResetCreatedAt resets all changes to the "created_at" field.
+// ResetCreatedAt resets all changes to the "createdAt" field.
 func (m *ChatMutation) ResetCreatedAt() {
-	m.created_at = nil
+	m.createdAt = nil
 }
 
 // SetOwnerID sets the "owner" edge to the User entity by id.
@@ -319,7 +479,7 @@ func (m *ChatMutation) SetOwnerID(id uuid.UUID) {
 // ClearOwner clears the "owner" edge to the User entity.
 func (m *ChatMutation) ClearOwner() {
 	m.clearedowner = true
-	m.clearedFields[chat.FieldUserID] = struct{}{}
+	m.clearedFields[chat.FieldUserId] = struct{}{}
 }
 
 // OwnerCleared reports if the "owner" edge to the User entity was cleared.
@@ -385,17 +545,26 @@ func (m *ChatMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ChatMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 7)
 	if m.title != nil {
 		fields = append(fields, chat.FieldTitle)
 	}
 	if m.owner != nil {
-		fields = append(fields, chat.FieldUserID)
+		fields = append(fields, chat.FieldUserId)
 	}
-	if m.chat != nil {
-		fields = append(fields, chat.FieldChat)
+	if m.models != nil {
+		fields = append(fields, chat.FieldModels)
 	}
-	if m.created_at != nil {
+	if m.tags != nil {
+		fields = append(fields, chat.FieldTags)
+	}
+	if m.history != nil {
+		fields = append(fields, chat.FieldHistory)
+	}
+	if m.messages != nil {
+		fields = append(fields, chat.FieldMessages)
+	}
+	if m.createdAt != nil {
 		fields = append(fields, chat.FieldCreatedAt)
 	}
 	return fields
@@ -408,10 +577,16 @@ func (m *ChatMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case chat.FieldTitle:
 		return m.Title()
-	case chat.FieldUserID:
-		return m.UserID()
-	case chat.FieldChat:
-		return m.Chat()
+	case chat.FieldUserId:
+		return m.UserId()
+	case chat.FieldModels:
+		return m.Models()
+	case chat.FieldTags:
+		return m.Tags()
+	case chat.FieldHistory:
+		return m.History()
+	case chat.FieldMessages:
+		return m.Messages()
 	case chat.FieldCreatedAt:
 		return m.CreatedAt()
 	}
@@ -425,10 +600,16 @@ func (m *ChatMutation) OldField(ctx context.Context, name string) (ent.Value, er
 	switch name {
 	case chat.FieldTitle:
 		return m.OldTitle(ctx)
-	case chat.FieldUserID:
-		return m.OldUserID(ctx)
-	case chat.FieldChat:
-		return m.OldChat(ctx)
+	case chat.FieldUserId:
+		return m.OldUserId(ctx)
+	case chat.FieldModels:
+		return m.OldModels(ctx)
+	case chat.FieldTags:
+		return m.OldTags(ctx)
+	case chat.FieldHistory:
+		return m.OldHistory(ctx)
+	case chat.FieldMessages:
+		return m.OldMessages(ctx)
 	case chat.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	}
@@ -447,19 +628,40 @@ func (m *ChatMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetTitle(v)
 		return nil
-	case chat.FieldUserID:
+	case chat.FieldUserId:
 		v, ok := value.(uuid.UUID)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetUserID(v)
+		m.SetUserId(v)
 		return nil
-	case chat.FieldChat:
-		v, ok := value.(string)
+	case chat.FieldModels:
+		v, ok := value.([]string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetChat(v)
+		m.SetModels(v)
+		return nil
+	case chat.FieldTags:
+		v, ok := value.([]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTags(v)
+		return nil
+	case chat.FieldHistory:
+		v, ok := value.(v1.Histroy)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetHistory(v)
+		return nil
+	case chat.FieldMessages:
+		v, ok := value.([]v1.Message)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetMessages(v)
 		return nil
 	case chat.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -520,11 +722,20 @@ func (m *ChatMutation) ResetField(name string) error {
 	case chat.FieldTitle:
 		m.ResetTitle()
 		return nil
-	case chat.FieldUserID:
-		m.ResetUserID()
+	case chat.FieldUserId:
+		m.ResetUserId()
 		return nil
-	case chat.FieldChat:
-		m.ResetChat()
+	case chat.FieldModels:
+		m.ResetModels()
+		return nil
+	case chat.FieldTags:
+		m.ResetTags()
+		return nil
+	case chat.FieldHistory:
+		m.ResetHistory()
+		return nil
+	case chat.FieldMessages:
+		m.ResetMessages()
 		return nil
 	case chat.FieldCreatedAt:
 		m.ResetCreatedAt()
@@ -1178,8 +1389,8 @@ type UserMutation struct {
 	email             *string
 	password          *string
 	role              *user.Role
-	profile_image_url *string
-	created_at        *time.Time
+	profileImageUrl   *string
+	createdAt         *time.Time
 	clearedFields     map[string]struct{}
 	chats             map[uuid.UUID]struct{}
 	removedchats      map[uuid.UUID]struct{}
@@ -1440,57 +1651,57 @@ func (m *UserMutation) ResetRole() {
 	m.role = nil
 }
 
-// SetProfileImageURL sets the "profile_image_url" field.
-func (m *UserMutation) SetProfileImageURL(s string) {
-	m.profile_image_url = &s
+// SetProfileImageUrl sets the "profileImageUrl" field.
+func (m *UserMutation) SetProfileImageUrl(s string) {
+	m.profileImageUrl = &s
 }
 
-// ProfileImageURL returns the value of the "profile_image_url" field in the mutation.
-func (m *UserMutation) ProfileImageURL() (r string, exists bool) {
-	v := m.profile_image_url
+// ProfileImageUrl returns the value of the "profileImageUrl" field in the mutation.
+func (m *UserMutation) ProfileImageUrl() (r string, exists bool) {
+	v := m.profileImageUrl
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldProfileImageURL returns the old "profile_image_url" field's value of the User entity.
+// OldProfileImageUrl returns the old "profileImageUrl" field's value of the User entity.
 // If the User object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *UserMutation) OldProfileImageURL(ctx context.Context) (v string, err error) {
+func (m *UserMutation) OldProfileImageUrl(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldProfileImageURL is only allowed on UpdateOne operations")
+		return v, errors.New("OldProfileImageUrl is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldProfileImageURL requires an ID field in the mutation")
+		return v, errors.New("OldProfileImageUrl requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldProfileImageURL: %w", err)
+		return v, fmt.Errorf("querying old value for OldProfileImageUrl: %w", err)
 	}
-	return oldValue.ProfileImageURL, nil
+	return oldValue.ProfileImageUrl, nil
 }
 
-// ResetProfileImageURL resets all changes to the "profile_image_url" field.
-func (m *UserMutation) ResetProfileImageURL() {
-	m.profile_image_url = nil
+// ResetProfileImageUrl resets all changes to the "profileImageUrl" field.
+func (m *UserMutation) ResetProfileImageUrl() {
+	m.profileImageUrl = nil
 }
 
-// SetCreatedAt sets the "created_at" field.
+// SetCreatedAt sets the "createdAt" field.
 func (m *UserMutation) SetCreatedAt(t time.Time) {
-	m.created_at = &t
+	m.createdAt = &t
 }
 
-// CreatedAt returns the value of the "created_at" field in the mutation.
+// CreatedAt returns the value of the "createdAt" field in the mutation.
 func (m *UserMutation) CreatedAt() (r time.Time, exists bool) {
-	v := m.created_at
+	v := m.createdAt
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldCreatedAt returns the old "created_at" field's value of the User entity.
+// OldCreatedAt returns the old "createdAt" field's value of the User entity.
 // If the User object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *UserMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
@@ -1507,9 +1718,9 @@ func (m *UserMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error
 	return oldValue.CreatedAt, nil
 }
 
-// ResetCreatedAt resets all changes to the "created_at" field.
+// ResetCreatedAt resets all changes to the "createdAt" field.
 func (m *UserMutation) ResetCreatedAt() {
-	m.created_at = nil
+	m.createdAt = nil
 }
 
 // AddChatIDs adds the "chats" edge to the Chat entity by ids.
@@ -1667,10 +1878,10 @@ func (m *UserMutation) Fields() []string {
 	if m.role != nil {
 		fields = append(fields, user.FieldRole)
 	}
-	if m.profile_image_url != nil {
-		fields = append(fields, user.FieldProfileImageURL)
+	if m.profileImageUrl != nil {
+		fields = append(fields, user.FieldProfileImageUrl)
 	}
-	if m.created_at != nil {
+	if m.createdAt != nil {
 		fields = append(fields, user.FieldCreatedAt)
 	}
 	return fields
@@ -1689,8 +1900,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.Password()
 	case user.FieldRole:
 		return m.Role()
-	case user.FieldProfileImageURL:
-		return m.ProfileImageURL()
+	case user.FieldProfileImageUrl:
+		return m.ProfileImageUrl()
 	case user.FieldCreatedAt:
 		return m.CreatedAt()
 	}
@@ -1710,8 +1921,8 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldPassword(ctx)
 	case user.FieldRole:
 		return m.OldRole(ctx)
-	case user.FieldProfileImageURL:
-		return m.OldProfileImageURL(ctx)
+	case user.FieldProfileImageUrl:
+		return m.OldProfileImageUrl(ctx)
 	case user.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	}
@@ -1751,12 +1962,12 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetRole(v)
 		return nil
-	case user.FieldProfileImageURL:
+	case user.FieldProfileImageUrl:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetProfileImageURL(v)
+		m.SetProfileImageUrl(v)
 		return nil
 	case user.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -1826,8 +2037,8 @@ func (m *UserMutation) ResetField(name string) error {
 	case user.FieldRole:
 		m.ResetRole()
 		return nil
-	case user.FieldProfileImageURL:
-		m.ResetProfileImageURL()
+	case user.FieldProfileImageUrl:
+		m.ResetProfileImageUrl()
 		return nil
 	case user.FieldCreatedAt:
 		m.ResetCreatedAt()

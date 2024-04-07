@@ -27,6 +27,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/chat"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/user"
+	v1 "github.com/llmos-ai/llmos-dashboard/pkg/types/v1"
 )
 
 // ChatCreate is the builder for creating a Chat entity.
@@ -42,25 +43,43 @@ func (cc *ChatCreate) SetTitle(s string) *ChatCreate {
 	return cc
 }
 
-// SetUserID sets the "user_id" field.
-func (cc *ChatCreate) SetUserID(u uuid.UUID) *ChatCreate {
-	cc.mutation.SetUserID(u)
+// SetUserId sets the "userId" field.
+func (cc *ChatCreate) SetUserId(u uuid.UUID) *ChatCreate {
+	cc.mutation.SetUserId(u)
 	return cc
 }
 
-// SetChat sets the "chat" field.
-func (cc *ChatCreate) SetChat(s string) *ChatCreate {
-	cc.mutation.SetChat(s)
+// SetModels sets the "models" field.
+func (cc *ChatCreate) SetModels(s []string) *ChatCreate {
+	cc.mutation.SetModels(s)
 	return cc
 }
 
-// SetCreatedAt sets the "created_at" field.
+// SetTags sets the "tags" field.
+func (cc *ChatCreate) SetTags(s []string) *ChatCreate {
+	cc.mutation.SetTags(s)
+	return cc
+}
+
+// SetHistory sets the "history" field.
+func (cc *ChatCreate) SetHistory(v v1.Histroy) *ChatCreate {
+	cc.mutation.SetHistory(v)
+	return cc
+}
+
+// SetMessages sets the "messages" field.
+func (cc *ChatCreate) SetMessages(v []v1.Message) *ChatCreate {
+	cc.mutation.SetMessages(v)
+	return cc
+}
+
+// SetCreatedAt sets the "createdAt" field.
 func (cc *ChatCreate) SetCreatedAt(t time.Time) *ChatCreate {
 	cc.mutation.SetCreatedAt(t)
 	return cc
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
 func (cc *ChatCreate) SetNillableCreatedAt(t *time.Time) *ChatCreate {
 	if t != nil {
 		cc.SetCreatedAt(*t)
@@ -148,14 +167,23 @@ func (cc *ChatCreate) check() error {
 			return &ValidationError{Name: "title", err: fmt.Errorf(`ent: validator failed for field "Chat.title": %w`, err)}
 		}
 	}
-	if _, ok := cc.mutation.UserID(); !ok {
-		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "Chat.user_id"`)}
+	if _, ok := cc.mutation.UserId(); !ok {
+		return &ValidationError{Name: "userId", err: errors.New(`ent: missing required field "Chat.userId"`)}
 	}
-	if _, ok := cc.mutation.Chat(); !ok {
-		return &ValidationError{Name: "chat", err: errors.New(`ent: missing required field "Chat.chat"`)}
+	if _, ok := cc.mutation.Models(); !ok {
+		return &ValidationError{Name: "models", err: errors.New(`ent: missing required field "Chat.models"`)}
+	}
+	if _, ok := cc.mutation.Tags(); !ok {
+		return &ValidationError{Name: "tags", err: errors.New(`ent: missing required field "Chat.tags"`)}
+	}
+	if _, ok := cc.mutation.History(); !ok {
+		return &ValidationError{Name: "history", err: errors.New(`ent: missing required field "Chat.history"`)}
+	}
+	if _, ok := cc.mutation.Messages(); !ok {
+		return &ValidationError{Name: "messages", err: errors.New(`ent: missing required field "Chat.messages"`)}
 	}
 	if _, ok := cc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Chat.created_at"`)}
+		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "Chat.createdAt"`)}
 	}
 	if _, ok := cc.mutation.OwnerID(); !ok {
 		return &ValidationError{Name: "owner", err: errors.New(`ent: missing required edge "Chat.owner"`)}
@@ -199,9 +227,21 @@ func (cc *ChatCreate) createSpec() (*Chat, *sqlgraph.CreateSpec) {
 		_spec.SetField(chat.FieldTitle, field.TypeString, value)
 		_node.Title = value
 	}
-	if value, ok := cc.mutation.Chat(); ok {
-		_spec.SetField(chat.FieldChat, field.TypeString, value)
-		_node.Chat = value
+	if value, ok := cc.mutation.Models(); ok {
+		_spec.SetField(chat.FieldModels, field.TypeJSON, value)
+		_node.Models = value
+	}
+	if value, ok := cc.mutation.Tags(); ok {
+		_spec.SetField(chat.FieldTags, field.TypeJSON, value)
+		_node.Tags = value
+	}
+	if value, ok := cc.mutation.History(); ok {
+		_spec.SetField(chat.FieldHistory, field.TypeJSON, value)
+		_node.History = value
+	}
+	if value, ok := cc.mutation.Messages(); ok {
+		_spec.SetField(chat.FieldMessages, field.TypeJSON, value)
+		_node.Messages = value
 	}
 	if value, ok := cc.mutation.CreatedAt(); ok {
 		_spec.SetField(chat.FieldCreatedAt, field.TypeTime, value)
@@ -221,7 +261,7 @@ func (cc *ChatCreate) createSpec() (*Chat, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.UserID = nodes[0]
+		_node.UserId = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

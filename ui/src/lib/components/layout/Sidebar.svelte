@@ -207,73 +207,73 @@
         </a>
       </div>
 
-      <div class="px-2 flex justify-center">
-        <a
-          class="flex-grow flex space-x-3 rounded-xl px-3.5 py-2 hover:bg-gray-200 dark:hover:bg-gray-900 transition"
-          href="/prompts"
-          on:click={() => {
-            selectedChatId = null;
-            chatId.set("");
-          }}
-        >
-          <div class="self-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="2"
-              stroke="currentColor"
-              class="w-4 h-4"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"
-              />
-            </svg>
-          </div>
+<!--      <div class="px-2 flex justify-center">-->
+<!--        <a-->
+<!--          class="flex-grow flex space-x-3 rounded-xl px-3.5 py-2 hover:bg-gray-200 dark:hover:bg-gray-900 transition"-->
+<!--          href="/prompts"-->
+<!--          on:click={() => {-->
+<!--            selectedChatId = null;-->
+<!--            chatId.set("");-->
+<!--          }}-->
+<!--        >-->
+<!--          <div class="self-center">-->
+<!--            <svg-->
+<!--              xmlns="http://www.w3.org/2000/svg"-->
+<!--              fill="none"-->
+<!--              viewBox="0 0 24 24"-->
+<!--              stroke-width="2"-->
+<!--              stroke="currentColor"-->
+<!--              class="w-4 h-4"-->
+<!--            >-->
+<!--              <path-->
+<!--                stroke-linecap="round"-->
+<!--                stroke-linejoin="round"-->
+<!--                d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125"-->
+<!--              />-->
+<!--            </svg>-->
+<!--          </div>-->
 
-          <div class="flex self-center">
-            <div class=" self-center font-medium text-sm">
-              {$i18n.t("Prompts")}
-            </div>
-          </div>
-        </a>
-      </div>
+<!--          <div class="flex self-center">-->
+<!--            <div class=" self-center font-medium text-sm">-->
+<!--              {$i18n.t("Prompts")}-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </a>-->
+<!--      </div>-->
 
-      <div class="px-2 flex justify-center mb-1">
-        <a
-          class="flex-grow flex space-x-3 rounded-xl px-3.5 py-2 hover:bg-gray-200 dark:hover:bg-gray-900 transition"
-          href="/documents"
-          on:click={() => {
-            selectedChatId = null;
-            chatId.set("");
-          }}
-        >
-          <div class="self-center">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke-width="2"
-              stroke="currentColor"
-              class="w-4 h-4"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"
-              />
-            </svg>
-          </div>
+<!--      <div class="px-2 flex justify-center mb-1">-->
+<!--        <a-->
+<!--          class="flex-grow flex space-x-3 rounded-xl px-3.5 py-2 hover:bg-gray-200 dark:hover:bg-gray-900 transition"-->
+<!--          href="/documents"-->
+<!--          on:click={() => {-->
+<!--            selectedChatId = null;-->
+<!--            chatId.set("");-->
+<!--          }}-->
+<!--        >-->
+<!--          <div class="self-center">-->
+<!--            <svg-->
+<!--              xmlns="http://www.w3.org/2000/svg"-->
+<!--              fill="none"-->
+<!--              viewBox="0 0 24 24"-->
+<!--              stroke-width="2"-->
+<!--              stroke="currentColor"-->
+<!--              class="w-4 h-4"-->
+<!--            >-->
+<!--              <path-->
+<!--                stroke-linecap="round"-->
+<!--                stroke-linejoin="round"-->
+<!--                d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75"-->
+<!--              />-->
+<!--            </svg>-->
+<!--          </div>-->
 
-          <div class="flex self-center">
-            <div class=" self-center font-medium text-sm">
-              {$i18n.t("Documents")}
-            </div>
-          </div>
-        </a>
-      </div>
+<!--          <div class="flex self-center">-->
+<!--            <div class=" self-center font-medium text-sm">-->
+<!--              {$i18n.t("Documents")}-->
+<!--            </div>-->
+<!--          </div>-->
+<!--        </a>-->
+<!--      </div>-->
     {/if}
 
     <div class="relative flex flex-col flex-1 overflow-y-auto">
@@ -457,14 +457,14 @@
 
             <div
               class="
-							
+
 							{chat.id === $chatId || chat.id === chatTitleEditId || chat.id === chatDeleteId
                 ? 'from-gray-300 dark:from-gray-900'
                 : chat.id === selectedChatId
                 ? 'from-gray-100 dark:from-gray-950'
                 : 'invisible group-hover:visible from-gray-100 dark:from-gray-950'}
 								absolute right-[10px] top-[10px] pr-2 pl-5 bg-gradient-to-l from-80%
-								
+
 								  to-transparent"
             >
               {#if chatTitleEditId === chat.id}
@@ -602,7 +602,7 @@
           >
             <div class=" self-center mr-3">
               <img
-                src={$user.profile_image_url}
+                src={$user.profileImageUrl}
                 class=" max-w-[30px] object-cover rounded-full"
                 alt="User profile"
               />

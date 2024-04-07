@@ -10,9 +10,7 @@ export const createNewChat = async (token: string, chat: object) => {
       "Content-Type": "application/json",
       authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({
-      chat: chat,
-    }),
+    body: JSON.stringify(chat),
   })
     .then(async (res) => {
       if (!res.ok) throw await res.json();
@@ -235,9 +233,7 @@ export const updateChatById = async (
       "Content-Type": "application/json",
       ...(token && { authorization: `Bearer ${token}` }),
     },
-    body: JSON.stringify({
-      chat: chat,
-    }),
+    body: JSON.stringify(chat),
   })
     .then(async (res) => {
       if (!res.ok) throw await res.json();

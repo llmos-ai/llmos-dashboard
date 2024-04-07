@@ -25,8 +25,8 @@ func (User) Fields() []ent.Field {
 		field.String("password").NotEmpty().Sensitive(),
 		field.Enum("role").Default("pending").
 			Values("admin", "user", "pending").Default("pending"),
-		field.String("profile_image_url").Default(""),
-		field.Time("created_at").Default(time.Now()).Immutable(),
+		field.String("profileImageUrl").Default("").StorageKey("profile_image_url"),
+		field.Time("createdAt").StorageKey("created_at").Default(time.Now()).Immutable(),
 	}
 }
 

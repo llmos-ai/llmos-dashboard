@@ -20,6 +20,10 @@ export default {
           900: "#171717",
           950: "#0d0d0d",
         },
+        blue: {
+          800: "#5f8fd4",
+          900: "#7096e6",
+        },
       },
       typography: {
         DEFAULT: {

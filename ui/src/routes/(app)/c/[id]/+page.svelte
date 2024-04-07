@@ -47,7 +47,6 @@
   import Navbar from "$lib/components/layout/Navbar.svelte";
   import { RAGTemplate } from "$lib/utils/rag";
   import {
-    LITELLM_API_BASE_URL,
     OPENAI_API_BASE_URL,
     WEBUI_BASE_URL,
   } from "$lib/constants";
@@ -106,7 +105,7 @@
     while (currentMessage !== null) {
       _messages.unshift({ ...currentMessage });
       currentMessage =
-        currentMessage.parentId !== null
+        currentMessage.parentId !== ""
           ? history.messages[currentMessage.parentId]
           : null;
     }
@@ -647,9 +646,7 @@
         max_tokens: $settings?.options?.num_predict ?? undefined,
         docs: docs.length > 0 ? docs : undefined,
       },
-      model.source === "litellm"
-        ? `${LITELLM_API_BASE_URL}/v1`
-        : `${OPENAI_API_BASE_URL}`
+      `${OPENAI_API_BASE_URL}`
     );
 
     if (res && res.ok) {

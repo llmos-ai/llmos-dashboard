@@ -17,6 +17,7 @@ limitations under the License.
 package ent
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -26,6 +27,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/chat"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/user"
+	v1 "github.com/llmos-ai/llmos-dashboard/pkg/types/v1"
 )
 
 // Chat is the model entity for the Chat schema.
@@ -35,12 +37,18 @@ type Chat struct {
 	ID uuid.UUID `json:"id,omitempty"`
 	// Title holds the value of the "title" field.
 	Title string `json:"title,omitempty"`
-	// UserID holds the value of the "user_id" field.
-	UserID uuid.UUID `json:"user_id,omitempty"`
-	// Chat holds the value of the "chat" field.
-	Chat string `json:"chat,omitempty"`
-	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt time.Time `json:"created_at,omitempty"`
+	// UserId holds the value of the "userId" field.
+	UserId uuid.UUID `json:"userId,omitempty"`
+	// Models holds the value of the "models" field.
+	Models []string `json:"models,omitempty"`
+	// Tags holds the value of the "tags" field.
+	Tags []string `json:"tags,omitempty"`
+	// History holds the value of the "history" field.
+	History v1.Histroy `json:"history,omitempty"`
+	// Messages holds the value of the "messages" field.
+	Messages []v1.Message `json:"messages,omitempty"`
+	// CreatedAt holds the value of the "createdAt" field.
+	CreatedAt time.Time `json:"createdAt,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ChatQuery when eager-loading is set.
 	Edges        ChatEdges `json:"edges"`
@@ -72,11 +80,13 @@ func (*Chat) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case chat.FieldTitle, chat.FieldChat:
+		case chat.FieldModels, chat.FieldTags, chat.FieldHistory, chat.FieldMessages:
+			values[i] = new([]byte)
+		case chat.FieldTitle:
 			values[i] = new(sql.NullString)
 		case chat.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
-		case chat.FieldID, chat.FieldUserID:
+		case chat.FieldID, chat.FieldUserId:
 			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -105,21 +115,47 @@ func (c *Chat) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				c.Title = value.String
 			}
-		case chat.FieldUserID:
+		case chat.FieldUserId:
 			if value, ok := values[i].(*uuid.UUID); !ok {
-				return fmt.Errorf("unexpected type %T for field user_id", values[i])
+				return fmt.Errorf("unexpected type %T for field userId", values[i])
 			} else if value != nil {
-				c.UserID = *value
+				c.UserId = *value
 			}
-		case chat.FieldChat:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field chat", values[i])
-			} else if value.Valid {
-				c.Chat = value.String
+		case chat.FieldModels:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field models", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &c.Models); err != nil {
+					return fmt.Errorf("unmarshal field models: %w", err)
+				}
+			}
+		case chat.FieldTags:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field tags", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &c.Tags); err != nil {
+					return fmt.Errorf("unmarshal field tags: %w", err)
+				}
+			}
+		case chat.FieldHistory:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field history", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &c.History); err != nil {
+					return fmt.Errorf("unmarshal field history: %w", err)
+				}
+			}
+		case chat.FieldMessages:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field messages", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &c.Messages); err != nil {
+					return fmt.Errorf("unmarshal field messages: %w", err)
+				}
 			}
 		case chat.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+				return fmt.Errorf("unexpected type %T for field createdAt", values[i])
 			} else if value.Valid {
 				c.CreatedAt = value.Time
 			}
@@ -167,13 +203,22 @@ func (c *Chat) String() string {
 	builder.WriteString("title=")
 	builder.WriteString(c.Title)
 	builder.WriteString(", ")
-	builder.WriteString("user_id=")
-	builder.WriteString(fmt.Sprintf("%v", c.UserID))
+	builder.WriteString("userId=")
+	builder.WriteString(fmt.Sprintf("%v", c.UserId))
 	builder.WriteString(", ")
-	builder.WriteString("chat=")
-	builder.WriteString(c.Chat)
+	builder.WriteString("models=")
+	builder.WriteString(fmt.Sprintf("%v", c.Models))
 	builder.WriteString(", ")
-	builder.WriteString("created_at=")
+	builder.WriteString("tags=")
+	builder.WriteString(fmt.Sprintf("%v", c.Tags))
+	builder.WriteString(", ")
+	builder.WriteString("history=")
+	builder.WriteString(fmt.Sprintf("%v", c.History))
+	builder.WriteString(", ")
+	builder.WriteString("messages=")
+	builder.WriteString(fmt.Sprintf("%v", c.Messages))
+	builder.WriteString(", ")
+	builder.WriteString("createdAt=")
 	builder.WriteString(c.CreatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()

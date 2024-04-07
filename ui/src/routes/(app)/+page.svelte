@@ -41,7 +41,7 @@
   import ModelSelector from "$lib/components/chat/ModelSelector.svelte";
   import Navbar from "$lib/components/layout/Navbar.svelte";
   import { RAGTemplate } from "$lib/utils/rag";
-  import { LITELLM_API_BASE_URL, OPENAI_API_BASE_URL } from "$lib/constants";
+  import { OPENAI_API_BASE_URL } from "$lib/constants";
   import { WEBUI_BASE_URL } from "$lib/constants";
 
   const i18n = getContext("i18n");
@@ -627,9 +627,7 @@
         max_tokens: $settings?.options?.num_predict ?? undefined,
         docs: docs.length > 0 ? docs : undefined,
       },
-      model.source === "litellm"
-        ? `${LITELLM_API_BASE_URL}/v1`
-        : `${OPENAI_API_BASE_URL}`
+      `${OPENAI_API_BASE_URL}`
     );
 
     if (res && res.ok) {

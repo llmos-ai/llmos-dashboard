@@ -6,7 +6,6 @@
   import { toast } from "svelte-sonner";
 
   import {
-    LITELLM_API_BASE_URL,
     OLLAMA_API_BASE_URL,
     OPENAI_API_BASE_URL,
     WEBUI_API_BASE_URL,
@@ -83,10 +82,9 @@
         ],
       },
       model.external
-        ? model.source === "litellm"
-          ? `${LITELLM_API_BASE_URL}/v1`
+        ? model.source === "ollama"
+          ? `${OLLAMA_API_BASE_URL}/v1`
           : `${OPENAI_API_BASE_URL}`
-        : `${OLLAMA_API_BASE_URL}/v1`
     );
 
     if (res && res.ok) {
@@ -154,10 +152,9 @@
         ].filter((message) => message),
       },
       model.external
-        ? model.source === "litellm"
-          ? `${LITELLM_API_BASE_URL}/v1`
+        ? model.source === "ollama"
+          ? `${OLLAMA_API_BASE_URL}/v1`
           : `${OPENAI_API_BASE_URL}`
-        : `${OLLAMA_API_BASE_URL}/v1`
     );
 
     let responseMessage;
