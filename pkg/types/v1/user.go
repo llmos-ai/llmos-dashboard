@@ -22,7 +22,7 @@ func (User) Fields() []ent.Field {
 			Default(uuid.New).Unique(),
 		field.String("name").NotEmpty().Unique(),
 		field.String("email").NotEmpty().Unique(),
-		field.String("password").NotEmpty(),
+		field.String("password").NotEmpty().Sensitive(),
 		field.Enum("role").Default("pending").
 			Values("admin", "user", "pending").Default("pending"),
 		field.String("profile_image_url").Default(""),
@@ -34,6 +34,7 @@ func (User) Fields() []ent.Field {
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("chats", Chat.Type),
+		edge.To("modelfiles", Modelfile.Type),
 	}
 }
 

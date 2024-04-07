@@ -54,7 +54,7 @@ func (md *ModelfileDelete) ExecX(ctx context.Context) int {
 }
 
 func (md *ModelfileDelete) sqlExec(ctx context.Context) (int, error) {
-	_spec := sqlgraph.NewDeleteSpec(modelfile.Table, sqlgraph.NewFieldSpec(modelfile.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewDeleteSpec(modelfile.Table, sqlgraph.NewFieldSpec(modelfile.FieldID, field.TypeUUID))
 	if ps := md.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {

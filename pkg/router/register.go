@@ -32,6 +32,7 @@ func RegisterRouters(r *gin.Engine, c *ent.Client, ctx context.Context) {
 	r.StaticFS("static", gin.Dir("static", true))
 
 	r.GET("api/config", GetAPIConfig)
+	r.GET("api/changelog", GetChangelog)
 
 	for _, router := range registeredRouters {
 		router(r, c, ctx)

@@ -24,8 +24,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/modelfile"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/predicate"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/user"
 )
 
 // ModelfileUpdate is the builder for updating Modelfile entities.
@@ -41,34 +43,13 @@ func (mu *ModelfileUpdate) Where(ps ...predicate.Modelfile) *ModelfileUpdate {
 	return mu
 }
 
-// SetUserID sets the "user_id" field.
-func (mu *ModelfileUpdate) SetUserID(i int) *ModelfileUpdate {
-	mu.mutation.ResetUserID()
-	mu.mutation.SetUserID(i)
-	return mu
-}
-
-// SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (mu *ModelfileUpdate) SetNillableUserID(i *int) *ModelfileUpdate {
-	if i != nil {
-		mu.SetUserID(*i)
-	}
-	return mu
-}
-
-// AddUserID adds i to the "user_id" field.
-func (mu *ModelfileUpdate) AddUserID(i int) *ModelfileUpdate {
-	mu.mutation.AddUserID(i)
-	return mu
-}
-
-// SetTagName sets the "tag_name" field.
+// SetTagName sets the "tagName" field.
 func (mu *ModelfileUpdate) SetTagName(s string) *ModelfileUpdate {
 	mu.mutation.SetTagName(s)
 	return mu
 }
 
-// SetNillableTagName sets the "tag_name" field if the given value is not nil.
+// SetNillableTagName sets the "tagName" field if the given value is not nil.
 func (mu *ModelfileUpdate) SetNillableTagName(s *string) *ModelfileUpdate {
 	if s != nil {
 		mu.SetTagName(*s)
@@ -90,9 +71,40 @@ func (mu *ModelfileUpdate) SetNillableModelfile(s *string) *ModelfileUpdate {
 	return mu
 }
 
+// SetUserId sets the "userId" field.
+func (mu *ModelfileUpdate) SetUserId(u uuid.UUID) *ModelfileUpdate {
+	mu.mutation.SetUserId(u)
+	return mu
+}
+
+// SetNillableUserId sets the "userId" field if the given value is not nil.
+func (mu *ModelfileUpdate) SetNillableUserId(u *uuid.UUID) *ModelfileUpdate {
+	if u != nil {
+		mu.SetUserId(*u)
+	}
+	return mu
+}
+
+// SetOwnerID sets the "owner" edge to the User entity by ID.
+func (mu *ModelfileUpdate) SetOwnerID(id uuid.UUID) *ModelfileUpdate {
+	mu.mutation.SetOwnerID(id)
+	return mu
+}
+
+// SetOwner sets the "owner" edge to the User entity.
+func (mu *ModelfileUpdate) SetOwner(u *User) *ModelfileUpdate {
+	return mu.SetOwnerID(u.ID)
+}
+
 // Mutation returns the ModelfileMutation object of the builder.
 func (mu *ModelfileUpdate) Mutation() *ModelfileMutation {
 	return mu.mutation
+}
+
+// ClearOwner clears the "owner" edge to the User entity.
+func (mu *ModelfileUpdate) ClearOwner() *ModelfileUpdate {
+	mu.mutation.ClearOwner()
+	return mu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -124,15 +136,18 @@ func (mu *ModelfileUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (mu *ModelfileUpdate) check() error {
-	if v, ok := mu.mutation.UserID(); ok {
-		if err := modelfile.UserIDValidator(v); err != nil {
-			return &ValidationError{Name: "user_id", err: fmt.Errorf(`ent: validator failed for field "Modelfile.user_id": %w`, err)}
-		}
-	}
 	if v, ok := mu.mutation.TagName(); ok {
 		if err := modelfile.TagNameValidator(v); err != nil {
-			return &ValidationError{Name: "tag_name", err: fmt.Errorf(`ent: validator failed for field "Modelfile.tag_name": %w`, err)}
+			return &ValidationError{Name: "tagName", err: fmt.Errorf(`ent: validator failed for field "Modelfile.tagName": %w`, err)}
 		}
+	}
+	if v, ok := mu.mutation.Modelfile(); ok {
+		if err := modelfile.ModelfileValidator(v); err != nil {
+			return &ValidationError{Name: "modelfile", err: fmt.Errorf(`ent: validator failed for field "Modelfile.modelfile": %w`, err)}
+		}
+	}
+	if _, ok := mu.mutation.OwnerID(); mu.mutation.OwnerCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Modelfile.owner"`)
 	}
 	return nil
 }
@@ -141,7 +156,7 @@ func (mu *ModelfileUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if err := mu.check(); err != nil {
 		return n, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(modelfile.Table, modelfile.Columns, sqlgraph.NewFieldSpec(modelfile.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(modelfile.Table, modelfile.Columns, sqlgraph.NewFieldSpec(modelfile.FieldID, field.TypeUUID))
 	if ps := mu.mutation.predicates; len(ps) > 0 {
 		_spec.Predicate = func(selector *sql.Selector) {
 			for i := range ps {
@@ -149,17 +164,40 @@ func (mu *ModelfileUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := mu.mutation.UserID(); ok {
-		_spec.SetField(modelfile.FieldUserID, field.TypeInt, value)
-	}
-	if value, ok := mu.mutation.AddedUserID(); ok {
-		_spec.AddField(modelfile.FieldUserID, field.TypeInt, value)
-	}
 	if value, ok := mu.mutation.TagName(); ok {
 		_spec.SetField(modelfile.FieldTagName, field.TypeString, value)
 	}
 	if value, ok := mu.mutation.Modelfile(); ok {
 		_spec.SetField(modelfile.FieldModelfile, field.TypeString, value)
+	}
+	if mu.mutation.OwnerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   modelfile.OwnerTable,
+			Columns: []string{modelfile.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := mu.mutation.OwnerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   modelfile.OwnerTable,
+			Columns: []string{modelfile.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, mu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -181,34 +219,13 @@ type ModelfileUpdateOne struct {
 	mutation *ModelfileMutation
 }
 
-// SetUserID sets the "user_id" field.
-func (muo *ModelfileUpdateOne) SetUserID(i int) *ModelfileUpdateOne {
-	muo.mutation.ResetUserID()
-	muo.mutation.SetUserID(i)
-	return muo
-}
-
-// SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (muo *ModelfileUpdateOne) SetNillableUserID(i *int) *ModelfileUpdateOne {
-	if i != nil {
-		muo.SetUserID(*i)
-	}
-	return muo
-}
-
-// AddUserID adds i to the "user_id" field.
-func (muo *ModelfileUpdateOne) AddUserID(i int) *ModelfileUpdateOne {
-	muo.mutation.AddUserID(i)
-	return muo
-}
-
-// SetTagName sets the "tag_name" field.
+// SetTagName sets the "tagName" field.
 func (muo *ModelfileUpdateOne) SetTagName(s string) *ModelfileUpdateOne {
 	muo.mutation.SetTagName(s)
 	return muo
 }
 
-// SetNillableTagName sets the "tag_name" field if the given value is not nil.
+// SetNillableTagName sets the "tagName" field if the given value is not nil.
 func (muo *ModelfileUpdateOne) SetNillableTagName(s *string) *ModelfileUpdateOne {
 	if s != nil {
 		muo.SetTagName(*s)
@@ -230,9 +247,40 @@ func (muo *ModelfileUpdateOne) SetNillableModelfile(s *string) *ModelfileUpdateO
 	return muo
 }
 
+// SetUserId sets the "userId" field.
+func (muo *ModelfileUpdateOne) SetUserId(u uuid.UUID) *ModelfileUpdateOne {
+	muo.mutation.SetUserId(u)
+	return muo
+}
+
+// SetNillableUserId sets the "userId" field if the given value is not nil.
+func (muo *ModelfileUpdateOne) SetNillableUserId(u *uuid.UUID) *ModelfileUpdateOne {
+	if u != nil {
+		muo.SetUserId(*u)
+	}
+	return muo
+}
+
+// SetOwnerID sets the "owner" edge to the User entity by ID.
+func (muo *ModelfileUpdateOne) SetOwnerID(id uuid.UUID) *ModelfileUpdateOne {
+	muo.mutation.SetOwnerID(id)
+	return muo
+}
+
+// SetOwner sets the "owner" edge to the User entity.
+func (muo *ModelfileUpdateOne) SetOwner(u *User) *ModelfileUpdateOne {
+	return muo.SetOwnerID(u.ID)
+}
+
 // Mutation returns the ModelfileMutation object of the builder.
 func (muo *ModelfileUpdateOne) Mutation() *ModelfileMutation {
 	return muo.mutation
+}
+
+// ClearOwner clears the "owner" edge to the User entity.
+func (muo *ModelfileUpdateOne) ClearOwner() *ModelfileUpdateOne {
+	muo.mutation.ClearOwner()
+	return muo
 }
 
 // Where appends a list predicates to the ModelfileUpdate builder.
@@ -277,15 +325,18 @@ func (muo *ModelfileUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (muo *ModelfileUpdateOne) check() error {
-	if v, ok := muo.mutation.UserID(); ok {
-		if err := modelfile.UserIDValidator(v); err != nil {
-			return &ValidationError{Name: "user_id", err: fmt.Errorf(`ent: validator failed for field "Modelfile.user_id": %w`, err)}
-		}
-	}
 	if v, ok := muo.mutation.TagName(); ok {
 		if err := modelfile.TagNameValidator(v); err != nil {
-			return &ValidationError{Name: "tag_name", err: fmt.Errorf(`ent: validator failed for field "Modelfile.tag_name": %w`, err)}
+			return &ValidationError{Name: "tagName", err: fmt.Errorf(`ent: validator failed for field "Modelfile.tagName": %w`, err)}
 		}
+	}
+	if v, ok := muo.mutation.Modelfile(); ok {
+		if err := modelfile.ModelfileValidator(v); err != nil {
+			return &ValidationError{Name: "modelfile", err: fmt.Errorf(`ent: validator failed for field "Modelfile.modelfile": %w`, err)}
+		}
+	}
+	if _, ok := muo.mutation.OwnerID(); muo.mutation.OwnerCleared() && !ok {
+		return errors.New(`ent: clearing a required unique edge "Modelfile.owner"`)
 	}
 	return nil
 }
@@ -294,7 +345,7 @@ func (muo *ModelfileUpdateOne) sqlSave(ctx context.Context) (_node *Modelfile, e
 	if err := muo.check(); err != nil {
 		return _node, err
 	}
-	_spec := sqlgraph.NewUpdateSpec(modelfile.Table, modelfile.Columns, sqlgraph.NewFieldSpec(modelfile.FieldID, field.TypeInt))
+	_spec := sqlgraph.NewUpdateSpec(modelfile.Table, modelfile.Columns, sqlgraph.NewFieldSpec(modelfile.FieldID, field.TypeUUID))
 	id, ok := muo.mutation.ID()
 	if !ok {
 		return nil, &ValidationError{Name: "id", err: errors.New(`ent: missing "Modelfile.id" for update`)}
@@ -319,17 +370,40 @@ func (muo *ModelfileUpdateOne) sqlSave(ctx context.Context) (_node *Modelfile, e
 			}
 		}
 	}
-	if value, ok := muo.mutation.UserID(); ok {
-		_spec.SetField(modelfile.FieldUserID, field.TypeInt, value)
-	}
-	if value, ok := muo.mutation.AddedUserID(); ok {
-		_spec.AddField(modelfile.FieldUserID, field.TypeInt, value)
-	}
 	if value, ok := muo.mutation.TagName(); ok {
 		_spec.SetField(modelfile.FieldTagName, field.TypeString, value)
 	}
 	if value, ok := muo.mutation.Modelfile(); ok {
 		_spec.SetField(modelfile.FieldModelfile, field.TypeString, value)
+	}
+	if muo.mutation.OwnerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   modelfile.OwnerTable,
+			Columns: []string{modelfile.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := muo.mutation.OwnerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   modelfile.OwnerTable,
+			Columns: []string{modelfile.OwnerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &Modelfile{config: muo.config}
 	_spec.Assign = _node.assignValues

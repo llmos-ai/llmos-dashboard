@@ -442,7 +442,7 @@ func (c *ModelfileClient) UpdateOne(m *Modelfile) *ModelfileUpdateOne {
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *ModelfileClient) UpdateOneID(id int) *ModelfileUpdateOne {
+func (c *ModelfileClient) UpdateOneID(id uuid.UUID) *ModelfileUpdateOne {
 	mutation := newModelfileMutation(c.config, OpUpdateOne, withModelfileID(id))
 	return &ModelfileUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
@@ -459,7 +459,7 @@ func (c *ModelfileClient) DeleteOne(m *Modelfile) *ModelfileDeleteOne {
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *ModelfileClient) DeleteOneID(id int) *ModelfileDeleteOne {
+func (c *ModelfileClient) DeleteOneID(id uuid.UUID) *ModelfileDeleteOne {
 	builder := c.Delete().Where(modelfile.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
@@ -476,17 +476,33 @@ func (c *ModelfileClient) Query() *ModelfileQuery {
 }
 
 // Get returns a Modelfile entity by its id.
-func (c *ModelfileClient) Get(ctx context.Context, id int) (*Modelfile, error) {
+func (c *ModelfileClient) Get(ctx context.Context, id uuid.UUID) (*Modelfile, error) {
 	return c.Query().Where(modelfile.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *ModelfileClient) GetX(ctx context.Context, id int) *Modelfile {
+func (c *ModelfileClient) GetX(ctx context.Context, id uuid.UUID) *Modelfile {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
 	}
 	return obj
+}
+
+// QueryOwner queries the owner edge of a Modelfile.
+func (c *ModelfileClient) QueryOwner(m *Modelfile) *UserQuery {
+	query := (&UserClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := m.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(modelfile.Table, modelfile.FieldID, id),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, modelfile.OwnerTable, modelfile.OwnerColumn),
+		)
+		fromV = sqlgraph.Neighbors(m.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
 }
 
 // Hooks returns the client hooks.
@@ -631,6 +647,22 @@ func (c *UserClient) QueryChats(u *User) *ChatQuery {
 			sqlgraph.From(user.Table, user.FieldID, id),
 			sqlgraph.To(chat.Table, chat.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, user.ChatsTable, user.ChatsColumn),
+		)
+		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryModelfiles queries the modelfiles edge of a User.
+func (c *UserClient) QueryModelfiles(u *User) *ModelfileQuery {
+	query := (&ModelfileClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := u.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, id),
+			sqlgraph.To(modelfile.Table, modelfile.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.ModelfilesTable, user.ModelfilesColumn),
 		)
 		fromV = sqlgraph.Neighbors(u.driver.Dialect(), step)
 		return fromV, nil

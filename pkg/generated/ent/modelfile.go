@@ -23,23 +23,48 @@ import (
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
+	"github.com/google/uuid"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/modelfile"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/user"
 )
 
 // Modelfile is the model entity for the Modelfile schema.
 type Modelfile struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
-	// UserID holds the value of the "user_id" field.
-	UserID int `json:"user_id,omitempty"`
-	// TagName holds the value of the "tag_name" field.
-	TagName string `json:"tag_name,omitempty"`
+	ID uuid.UUID `json:"id,omitempty"`
+	// TagName holds the value of the "tagName" field.
+	TagName string `json:"tagName,omitempty"`
 	// Modelfile holds the value of the "modelfile" field.
 	Modelfile string `json:"modelfile,omitempty"`
-	// CreatedAt holds the value of the "created_at" field.
-	CreatedAt    time.Time `json:"created_at,omitempty"`
+	// UserId holds the value of the "userId" field.
+	UserId uuid.UUID `json:"userId,omitempty"`
+	// CreatedAt holds the value of the "createdAt" field.
+	CreatedAt time.Time `json:"createdAt,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the ModelfileQuery when eager-loading is set.
+	Edges        ModelfileEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// ModelfileEdges holds the relations/edges for other nodes in the graph.
+type ModelfileEdges struct {
+	// Owner holds the value of the owner edge.
+	Owner *User `json:"owner,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// OwnerOrErr returns the Owner value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e ModelfileEdges) OwnerOrErr() (*User, error) {
+	if e.Owner != nil {
+		return e.Owner, nil
+	} else if e.loadedTypes[0] {
+		return nil, &NotFoundError{label: user.Label}
+	}
+	return nil, &NotLoadedError{edge: "owner"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -47,12 +72,12 @@ func (*Modelfile) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case modelfile.FieldID, modelfile.FieldUserID:
-			values[i] = new(sql.NullInt64)
 		case modelfile.FieldTagName, modelfile.FieldModelfile:
 			values[i] = new(sql.NullString)
 		case modelfile.FieldCreatedAt:
 			values[i] = new(sql.NullTime)
+		case modelfile.FieldID, modelfile.FieldUserId:
+			values[i] = new(uuid.UUID)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -69,20 +94,14 @@ func (m *Modelfile) assignValues(columns []string, values []any) error {
 	for i := range columns {
 		switch columns[i] {
 		case modelfile.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
-			}
-			m.ID = int(value.Int64)
-		case modelfile.FieldUserID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field user_id", values[i])
-			} else if value.Valid {
-				m.UserID = int(value.Int64)
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value != nil {
+				m.ID = *value
 			}
 		case modelfile.FieldTagName:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field tag_name", values[i])
+				return fmt.Errorf("unexpected type %T for field tagName", values[i])
 			} else if value.Valid {
 				m.TagName = value.String
 			}
@@ -92,9 +111,15 @@ func (m *Modelfile) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				m.Modelfile = value.String
 			}
+		case modelfile.FieldUserId:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field userId", values[i])
+			} else if value != nil {
+				m.UserId = *value
+			}
 		case modelfile.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+				return fmt.Errorf("unexpected type %T for field createdAt", values[i])
 			} else if value.Valid {
 				m.CreatedAt = value.Time
 			}
@@ -109,6 +134,11 @@ func (m *Modelfile) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (m *Modelfile) Value(name string) (ent.Value, error) {
 	return m.selectValues.Get(name)
+}
+
+// QueryOwner queries the "owner" edge of the Modelfile entity.
+func (m *Modelfile) QueryOwner() *UserQuery {
+	return NewModelfileClient(m.config).QueryOwner(m)
 }
 
 // Update returns a builder for updating this Modelfile.
@@ -134,16 +164,16 @@ func (m *Modelfile) String() string {
 	var builder strings.Builder
 	builder.WriteString("Modelfile(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", m.ID))
-	builder.WriteString("user_id=")
-	builder.WriteString(fmt.Sprintf("%v", m.UserID))
-	builder.WriteString(", ")
-	builder.WriteString("tag_name=")
+	builder.WriteString("tagName=")
 	builder.WriteString(m.TagName)
 	builder.WriteString(", ")
 	builder.WriteString("modelfile=")
 	builder.WriteString(m.Modelfile)
 	builder.WriteString(", ")
-	builder.WriteString("created_at=")
+	builder.WriteString("userId=")
+	builder.WriteString(fmt.Sprintf("%v", m.UserId))
+	builder.WriteString(", ")
+	builder.WriteString("createdAt=")
 	builder.WriteString(m.CreatedAt.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()

@@ -612,13 +612,13 @@ type ModelfileMutation struct {
 	config
 	op            Op
 	typ           string
-	id            *int
-	user_id       *int
-	adduser_id    *int
-	tag_name      *string
+	id            *uuid.UUID
+	tagName       *string
 	modelfile     *string
-	created_at    *time.Time
+	createdAt     *time.Time
 	clearedFields map[string]struct{}
+	owner         *uuid.UUID
+	clearedowner  bool
 	done          bool
 	oldValue      func(context.Context) (*Modelfile, error)
 	predicates    []predicate.Modelfile
@@ -644,7 +644,7 @@ func newModelfileMutation(c config, op Op, opts ...modelfileOption) *ModelfileMu
 }
 
 // withModelfileID sets the ID field of the mutation.
-func withModelfileID(id int) modelfileOption {
+func withModelfileID(id uuid.UUID) modelfileOption {
 	return func(m *ModelfileMutation) {
 		var (
 			err   error
@@ -694,9 +694,15 @@ func (m ModelfileMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Modelfile entities.
+func (m *ModelfileMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *ModelfileMutation) ID() (id int, exists bool) {
+func (m *ModelfileMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -707,12 +713,12 @@ func (m *ModelfileMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *ModelfileMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *ModelfileMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []int{id}, nil
+			return []uuid.UUID{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -722,77 +728,21 @@ func (m *ModelfileMutation) IDs(ctx context.Context) ([]int, error) {
 	}
 }
 
-// SetUserID sets the "user_id" field.
-func (m *ModelfileMutation) SetUserID(i int) {
-	m.user_id = &i
-	m.adduser_id = nil
-}
-
-// UserID returns the value of the "user_id" field in the mutation.
-func (m *ModelfileMutation) UserID() (r int, exists bool) {
-	v := m.user_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldUserID returns the old "user_id" field's value of the Modelfile entity.
-// If the Modelfile object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *ModelfileMutation) OldUserID(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldUserID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldUserID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldUserID: %w", err)
-	}
-	return oldValue.UserID, nil
-}
-
-// AddUserID adds i to the "user_id" field.
-func (m *ModelfileMutation) AddUserID(i int) {
-	if m.adduser_id != nil {
-		*m.adduser_id += i
-	} else {
-		m.adduser_id = &i
-	}
-}
-
-// AddedUserID returns the value that was added to the "user_id" field in this mutation.
-func (m *ModelfileMutation) AddedUserID() (r int, exists bool) {
-	v := m.adduser_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetUserID resets all changes to the "user_id" field.
-func (m *ModelfileMutation) ResetUserID() {
-	m.user_id = nil
-	m.adduser_id = nil
-}
-
-// SetTagName sets the "tag_name" field.
+// SetTagName sets the "tagName" field.
 func (m *ModelfileMutation) SetTagName(s string) {
-	m.tag_name = &s
+	m.tagName = &s
 }
 
-// TagName returns the value of the "tag_name" field in the mutation.
+// TagName returns the value of the "tagName" field in the mutation.
 func (m *ModelfileMutation) TagName() (r string, exists bool) {
-	v := m.tag_name
+	v := m.tagName
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldTagName returns the old "tag_name" field's value of the Modelfile entity.
+// OldTagName returns the old "tagName" field's value of the Modelfile entity.
 // If the Modelfile object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *ModelfileMutation) OldTagName(ctx context.Context) (v string, err error) {
@@ -809,9 +759,9 @@ func (m *ModelfileMutation) OldTagName(ctx context.Context) (v string, err error
 	return oldValue.TagName, nil
 }
 
-// ResetTagName resets all changes to the "tag_name" field.
+// ResetTagName resets all changes to the "tagName" field.
 func (m *ModelfileMutation) ResetTagName() {
-	m.tag_name = nil
+	m.tagName = nil
 }
 
 // SetModelfile sets the "modelfile" field.
@@ -850,21 +800,57 @@ func (m *ModelfileMutation) ResetModelfile() {
 	m.modelfile = nil
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (m *ModelfileMutation) SetCreatedAt(t time.Time) {
-	m.created_at = &t
+// SetUserId sets the "userId" field.
+func (m *ModelfileMutation) SetUserId(u uuid.UUID) {
+	m.owner = &u
 }
 
-// CreatedAt returns the value of the "created_at" field in the mutation.
-func (m *ModelfileMutation) CreatedAt() (r time.Time, exists bool) {
-	v := m.created_at
+// UserId returns the value of the "userId" field in the mutation.
+func (m *ModelfileMutation) UserId() (r uuid.UUID, exists bool) {
+	v := m.owner
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldCreatedAt returns the old "created_at" field's value of the Modelfile entity.
+// OldUserId returns the old "userId" field's value of the Modelfile entity.
+// If the Modelfile object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ModelfileMutation) OldUserId(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserId is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserId requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserId: %w", err)
+	}
+	return oldValue.UserId, nil
+}
+
+// ResetUserId resets all changes to the "userId" field.
+func (m *ModelfileMutation) ResetUserId() {
+	m.owner = nil
+}
+
+// SetCreatedAt sets the "createdAt" field.
+func (m *ModelfileMutation) SetCreatedAt(t time.Time) {
+	m.createdAt = &t
+}
+
+// CreatedAt returns the value of the "createdAt" field in the mutation.
+func (m *ModelfileMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.createdAt
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "createdAt" field's value of the Modelfile entity.
 // If the Modelfile object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
 func (m *ModelfileMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
@@ -881,9 +867,49 @@ func (m *ModelfileMutation) OldCreatedAt(ctx context.Context) (v time.Time, err 
 	return oldValue.CreatedAt, nil
 }
 
-// ResetCreatedAt resets all changes to the "created_at" field.
+// ResetCreatedAt resets all changes to the "createdAt" field.
 func (m *ModelfileMutation) ResetCreatedAt() {
-	m.created_at = nil
+	m.createdAt = nil
+}
+
+// SetOwnerID sets the "owner" edge to the User entity by id.
+func (m *ModelfileMutation) SetOwnerID(id uuid.UUID) {
+	m.owner = &id
+}
+
+// ClearOwner clears the "owner" edge to the User entity.
+func (m *ModelfileMutation) ClearOwner() {
+	m.clearedowner = true
+	m.clearedFields[modelfile.FieldUserId] = struct{}{}
+}
+
+// OwnerCleared reports if the "owner" edge to the User entity was cleared.
+func (m *ModelfileMutation) OwnerCleared() bool {
+	return m.clearedowner
+}
+
+// OwnerID returns the "owner" edge ID in the mutation.
+func (m *ModelfileMutation) OwnerID() (id uuid.UUID, exists bool) {
+	if m.owner != nil {
+		return *m.owner, true
+	}
+	return
+}
+
+// OwnerIDs returns the "owner" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// OwnerID instead. It exists only for internal usage by the builders.
+func (m *ModelfileMutation) OwnerIDs() (ids []uuid.UUID) {
+	if id := m.owner; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetOwner resets all changes to the "owner" edge.
+func (m *ModelfileMutation) ResetOwner() {
+	m.owner = nil
+	m.clearedowner = false
 }
 
 // Where appends a list predicates to the ModelfileMutation builder.
@@ -921,16 +947,16 @@ func (m *ModelfileMutation) Type() string {
 // AddedFields().
 func (m *ModelfileMutation) Fields() []string {
 	fields := make([]string, 0, 4)
-	if m.user_id != nil {
-		fields = append(fields, modelfile.FieldUserID)
-	}
-	if m.tag_name != nil {
+	if m.tagName != nil {
 		fields = append(fields, modelfile.FieldTagName)
 	}
 	if m.modelfile != nil {
 		fields = append(fields, modelfile.FieldModelfile)
 	}
-	if m.created_at != nil {
+	if m.owner != nil {
+		fields = append(fields, modelfile.FieldUserId)
+	}
+	if m.createdAt != nil {
 		fields = append(fields, modelfile.FieldCreatedAt)
 	}
 	return fields
@@ -941,12 +967,12 @@ func (m *ModelfileMutation) Fields() []string {
 // schema.
 func (m *ModelfileMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case modelfile.FieldUserID:
-		return m.UserID()
 	case modelfile.FieldTagName:
 		return m.TagName()
 	case modelfile.FieldModelfile:
 		return m.Modelfile()
+	case modelfile.FieldUserId:
+		return m.UserId()
 	case modelfile.FieldCreatedAt:
 		return m.CreatedAt()
 	}
@@ -958,12 +984,12 @@ func (m *ModelfileMutation) Field(name string) (ent.Value, bool) {
 // database failed.
 func (m *ModelfileMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case modelfile.FieldUserID:
-		return m.OldUserID(ctx)
 	case modelfile.FieldTagName:
 		return m.OldTagName(ctx)
 	case modelfile.FieldModelfile:
 		return m.OldModelfile(ctx)
+	case modelfile.FieldUserId:
+		return m.OldUserId(ctx)
 	case modelfile.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	}
@@ -975,13 +1001,6 @@ func (m *ModelfileMutation) OldField(ctx context.Context, name string) (ent.Valu
 // type.
 func (m *ModelfileMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case modelfile.FieldUserID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetUserID(v)
-		return nil
 	case modelfile.FieldTagName:
 		v, ok := value.(string)
 		if !ok {
@@ -995,6 +1014,13 @@ func (m *ModelfileMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetModelfile(v)
+		return nil
+	case modelfile.FieldUserId:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserId(v)
 		return nil
 	case modelfile.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -1010,21 +1036,13 @@ func (m *ModelfileMutation) SetField(name string, value ent.Value) error {
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
 func (m *ModelfileMutation) AddedFields() []string {
-	var fields []string
-	if m.adduser_id != nil {
-		fields = append(fields, modelfile.FieldUserID)
-	}
-	return fields
+	return nil
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
 func (m *ModelfileMutation) AddedField(name string) (ent.Value, bool) {
-	switch name {
-	case modelfile.FieldUserID:
-		return m.AddedUserID()
-	}
 	return nil, false
 }
 
@@ -1033,13 +1051,6 @@ func (m *ModelfileMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *ModelfileMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case modelfile.FieldUserID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddUserID(v)
-		return nil
 	}
 	return fmt.Errorf("unknown Modelfile numeric field %s", name)
 }
@@ -1067,14 +1078,14 @@ func (m *ModelfileMutation) ClearField(name string) error {
 // It returns an error if the field is not defined in the schema.
 func (m *ModelfileMutation) ResetField(name string) error {
 	switch name {
-	case modelfile.FieldUserID:
-		m.ResetUserID()
-		return nil
 	case modelfile.FieldTagName:
 		m.ResetTagName()
 		return nil
 	case modelfile.FieldModelfile:
 		m.ResetModelfile()
+		return nil
+	case modelfile.FieldUserId:
+		m.ResetUserId()
 		return nil
 	case modelfile.FieldCreatedAt:
 		m.ResetCreatedAt()
@@ -1085,19 +1096,28 @@ func (m *ModelfileMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *ModelfileMutation) AddedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.owner != nil {
+		edges = append(edges, modelfile.EdgeOwner)
+	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
 func (m *ModelfileMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case modelfile.EdgeOwner:
+		if id := m.owner; id != nil {
+			return []ent.Value{*id}
+		}
+	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *ModelfileMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
 	return edges
 }
 
@@ -1109,25 +1129,42 @@ func (m *ModelfileMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *ModelfileMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 0)
+	edges := make([]string, 0, 1)
+	if m.clearedowner {
+		edges = append(edges, modelfile.EdgeOwner)
+	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
 func (m *ModelfileMutation) EdgeCleared(name string) bool {
+	switch name {
+	case modelfile.EdgeOwner:
+		return m.clearedowner
+	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
 func (m *ModelfileMutation) ClearEdge(name string) error {
+	switch name {
+	case modelfile.EdgeOwner:
+		m.ClearOwner()
+		return nil
+	}
 	return fmt.Errorf("unknown Modelfile unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
 func (m *ModelfileMutation) ResetEdge(name string) error {
+	switch name {
+	case modelfile.EdgeOwner:
+		m.ResetOwner()
+		return nil
+	}
 	return fmt.Errorf("unknown Modelfile edge %s", name)
 }
 
@@ -1147,6 +1184,9 @@ type UserMutation struct {
 	chats             map[uuid.UUID]struct{}
 	removedchats      map[uuid.UUID]struct{}
 	clearedchats      bool
+	modelfiles        map[uuid.UUID]struct{}
+	removedmodelfiles map[uuid.UUID]struct{}
+	clearedmodelfiles bool
 	done              bool
 	oldValue          func(context.Context) (*User, error)
 	predicates        []predicate.User
@@ -1526,6 +1566,60 @@ func (m *UserMutation) ResetChats() {
 	m.removedchats = nil
 }
 
+// AddModelfileIDs adds the "modelfiles" edge to the Modelfile entity by ids.
+func (m *UserMutation) AddModelfileIDs(ids ...uuid.UUID) {
+	if m.modelfiles == nil {
+		m.modelfiles = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.modelfiles[ids[i]] = struct{}{}
+	}
+}
+
+// ClearModelfiles clears the "modelfiles" edge to the Modelfile entity.
+func (m *UserMutation) ClearModelfiles() {
+	m.clearedmodelfiles = true
+}
+
+// ModelfilesCleared reports if the "modelfiles" edge to the Modelfile entity was cleared.
+func (m *UserMutation) ModelfilesCleared() bool {
+	return m.clearedmodelfiles
+}
+
+// RemoveModelfileIDs removes the "modelfiles" edge to the Modelfile entity by IDs.
+func (m *UserMutation) RemoveModelfileIDs(ids ...uuid.UUID) {
+	if m.removedmodelfiles == nil {
+		m.removedmodelfiles = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.modelfiles, ids[i])
+		m.removedmodelfiles[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedModelfiles returns the removed IDs of the "modelfiles" edge to the Modelfile entity.
+func (m *UserMutation) RemovedModelfilesIDs() (ids []uuid.UUID) {
+	for id := range m.removedmodelfiles {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ModelfilesIDs returns the "modelfiles" edge IDs in the mutation.
+func (m *UserMutation) ModelfilesIDs() (ids []uuid.UUID) {
+	for id := range m.modelfiles {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetModelfiles resets all changes to the "modelfiles" edge.
+func (m *UserMutation) ResetModelfiles() {
+	m.modelfiles = nil
+	m.clearedmodelfiles = false
+	m.removedmodelfiles = nil
+}
+
 // Where appends a list predicates to the UserMutation builder.
 func (m *UserMutation) Where(ps ...predicate.User) {
 	m.predicates = append(m.predicates, ps...)
@@ -1744,9 +1838,12 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.chats != nil {
 		edges = append(edges, user.EdgeChats)
+	}
+	if m.modelfiles != nil {
+		edges = append(edges, user.EdgeModelfiles)
 	}
 	return edges
 }
@@ -1761,15 +1858,24 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeModelfiles:
+		ids := make([]ent.Value, 0, len(m.modelfiles))
+		for id := range m.modelfiles {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.removedchats != nil {
 		edges = append(edges, user.EdgeChats)
+	}
+	if m.removedmodelfiles != nil {
+		edges = append(edges, user.EdgeModelfiles)
 	}
 	return edges
 }
@@ -1784,15 +1890,24 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeModelfiles:
+		ids := make([]ent.Value, 0, len(m.removedmodelfiles))
+		for id := range m.removedmodelfiles {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 1)
+	edges := make([]string, 0, 2)
 	if m.clearedchats {
 		edges = append(edges, user.EdgeChats)
+	}
+	if m.clearedmodelfiles {
+		edges = append(edges, user.EdgeModelfiles)
 	}
 	return edges
 }
@@ -1803,6 +1918,8 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 	switch name {
 	case user.EdgeChats:
 		return m.clearedchats
+	case user.EdgeModelfiles:
+		return m.clearedmodelfiles
 	}
 	return false
 }
@@ -1821,6 +1938,9 @@ func (m *UserMutation) ResetEdge(name string) error {
 	switch name {
 	case user.EdgeChats:
 		m.ResetChats()
+		return nil
+	case user.EdgeModelfiles:
+		m.ResetModelfiles()
 		return nil
 	}
 	return fmt.Errorf("unknown User edge %s", name)

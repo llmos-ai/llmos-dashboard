@@ -24,7 +24,7 @@ func main() {
 	config := &gen.Config{
 		Header:  string(header),
 		Target:  "./pkg/generated/ent",
-		Package: "github.com/llmos/llmos-dashboard/pkg/generated/ent",
+		Package: "github.com/llmos-ai/llmos-dashboard/pkg/generated/ent",
 	}
 	if err = entc.Generate("./pkg/types/v1", config); err != nil {
 		log.Fatal("running ent codegen:", err)

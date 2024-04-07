@@ -26,6 +26,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/chat"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/modelfile"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/user"
 )
 
@@ -123,6 +124,21 @@ func (uc *UserCreate) AddChats(c ...*Chat) *UserCreate {
 		ids[i] = c[i].ID
 	}
 	return uc.AddChatIDs(ids...)
+}
+
+// AddModelfileIDs adds the "modelfiles" edge to the Modelfile entity by IDs.
+func (uc *UserCreate) AddModelfileIDs(ids ...uuid.UUID) *UserCreate {
+	uc.mutation.AddModelfileIDs(ids...)
+	return uc
+}
+
+// AddModelfiles adds the "modelfiles" edges to the Modelfile entity.
+func (uc *UserCreate) AddModelfiles(m ...*Modelfile) *UserCreate {
+	ids := make([]uuid.UUID, len(m))
+	for i := range m {
+		ids[i] = m[i].ID
+	}
+	return uc.AddModelfileIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -286,6 +302,22 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(chat.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.ModelfilesIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.ModelfilesTable,
+			Columns: []string{user.ModelfilesColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(modelfile.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {
