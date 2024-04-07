@@ -12,6 +12,7 @@ export const createNewModelfile = async (token: string, modelfile: object) => {
     },
     body: JSON.stringify({
       modelfile: modelfile,
+      tagName: modelfile.tagName,
     }),
   })
     .then(async (res) => {
@@ -59,7 +60,7 @@ export const getModelfiles = async (token: string = "") => {
     throw error;
   }
 
-  return res.map((modelfile) => modelfile.modelfile);
+  return res.map((modelfile) => modelfile);
 };
 
 export const getModelfileByTagName = async (token: string, tagName: string) => {
@@ -73,7 +74,7 @@ export const getModelfileByTagName = async (token: string, tagName: string) => {
       authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
-      tag_name: tagName,
+      tagName: tagName,
     }),
   })
     .then(async (res) => {
@@ -97,9 +98,8 @@ export const getModelfileByTagName = async (token: string, tagName: string) => {
   return res.modelfile;
 };
 
-export const updateModelfileByTagName = async (
+export const updateModelfileByUID = async (
   token: string,
-  tagName: string,
   modelfile: object
 ) => {
   let error = null;
@@ -112,8 +112,9 @@ export const updateModelfileByTagName = async (
       authorization: `Bearer ${token}`,
     },
     body: JSON.stringify({
-      tag_name: tagName,
-      modelfile: modelfile,
+      id: modelfile.id,
+      tagName: modelfile.tagName,
+      modelfile: modelfile.modelfile,
     }),
   })
     .then(async (res) => {
@@ -137,22 +138,19 @@ export const updateModelfileByTagName = async (
   return res;
 };
 
-export const deleteModelfileByTagName = async (
+export const deleteModelfileByUID = async (
   token: string,
-  tagName: string
+  id: string
 ) => {
   let error = null;
 
-  const res = await fetch(`${WEBUI_API_BASE_URL}/modelfiles/delete`, {
+  const res = await fetch(`${WEBUI_API_BASE_URL}/modelfiles/${id}`, {
     method: "DELETE",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json",
       authorization: `Bearer ${token}`,
     },
-    body: JSON.stringify({
-      tag_name: tagName,
-    }),
   })
     .then(async (res) => {
       if (!res.ok) throw await res.json();

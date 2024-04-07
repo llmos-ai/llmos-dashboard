@@ -12,7 +12,7 @@
   import { createModel } from "$lib/apis/ollama";
   import {
     getModelfiles,
-    updateModelfileByTagName,
+    updateModelfileByUID,
   } from "$lib/apis/modelfiles";
 
   import AdvancedParams from "$lib/components/chat/Settings/Advanced/AdvancedParams.svelte";
@@ -28,11 +28,13 @@
   let pullProgress = null;
   let success = false;
 
+  let mf = null;
   let modelfile = null;
   // ///////////
   // Modelfile
   // ///////////
 
+  let uid = ""
   let title = "";
   let tagName = "";
   let desc = "";
@@ -62,12 +64,14 @@
     tagName = $page.url.searchParams.get("tag");
 
     if (tagName) {
-      modelfile = $modelfiles.filter(
+      mf = $modelfiles.filter(
         (modelfile) => modelfile.tagName === tagName
       )[0];
 
-      console.log(modelfile);
+      console.log(mf);
 
+      uid = mf.id
+      modelfile = mf.modelfile
       imageUrl = modelfile.imageUrl;
       title = modelfile.title;
       desc = modelfile.desc;
@@ -90,9 +94,9 @@
   });
 
   const updateModelfile = async (modelfile) => {
-    await updateModelfileByTagName(
+    console.log(modelfile);
+    await updateModelfileByUID(
       localStorage.token,
-      modelfile.tagName,
       modelfile
     );
     await modelfiles.set(await getModelfiles(localStorage.token));
@@ -111,6 +115,7 @@
     }
 
     if (
+      uid !== "" &&
       title !== "" &&
       desc !== "" &&
       content !== "" &&
@@ -180,17 +185,21 @@
 
       if (success) {
         await updateModelfile({
+          id: uid,
           tagName: tagName,
-          imageUrl: imageUrl,
-          title: title,
-          desc: desc,
-          content: content,
-          suggestionPrompts: suggestions.filter(
-            (prompt) => prompt.content !== ""
-          ),
-          categories: Object.keys(categories).filter(
-            (category) => categories[category]
-          ),
+          modelfile: {
+            tagName: tagName,
+            imageUrl: imageUrl,
+            title: title,
+            desc: desc,
+            content: content,
+            suggestionPrompts: suggestions.filter(
+              (prompt) => prompt.content !== ""
+            ),
+            categories: Object.keys(categories).filter(
+              (category) => categories[category]
+            ),
+          }
         });
         await goto("/modelfiles");
       }
