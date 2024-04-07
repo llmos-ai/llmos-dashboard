@@ -9,7 +9,7 @@
   import { createModel, deleteModel } from "$lib/apis/ollama";
   import {
     createNewModelfile,
-    deleteModelfileByTagName,
+    deleteModelfileByUID,
     getModelfiles,
   } from "$lib/apis/modelfiles";
   import { goto } from "$app/navigation";
@@ -34,9 +34,9 @@
     return success;
   };
 
-  const deleteModelfile = async (tagName) => {
-    await deleteModelHandler(tagName);
-    await deleteModelfileByTagName(localStorage.token, tagName);
+  const deleteModelfile = async (mf) => {
+    await deleteModelHandler(mf.tagName);
+    await deleteModelfileByUID(localStorage.token, mf.id);
     await modelfiles.set(await getModelfiles(localStorage.token));
   };
 
@@ -121,18 +121,18 @@
       <hr class=" dark:border-gray-700" />
 
       <div class=" my-2 mb-5">
-        {#each $modelfiles as modelfile}
+        {#each $modelfiles as mf}
           <div
             class=" flex space-x-4 cursor-pointer w-full px-3 py-2 dark:hover:bg-white/5 hover:bg-black/5 rounded-xl"
           >
             <a
               class=" flex flex-1 space-x-4 cursor-pointer w-full"
-              href={`/?models=${encodeURIComponent(modelfile.tagName)}`}
+              href={`/?models=${encodeURIComponent(mf.modelfile.tagName)}`}
             >
               <div class=" self-center w-10">
                 <div class=" rounded-full bg-stone-700">
                   <img
-                    src={modelfile.imageUrl ?? "/user.png"}
+                    src={mf.modelfile.imageUrl ?? "/user.png"}
                     alt="modelfile profile"
                     class=" rounded-full w-full h-auto object-cover"
                   />
@@ -140,11 +140,11 @@
               </div>
 
               <div class=" flex-1 self-center">
-                <div class=" font-bold capitalize">{modelfile.title}</div>
+                <div class=" font-bold capitalize">{mf.modelfile.title}</div>
                 <div
                   class=" text-sm overflow-hidden text-ellipsis line-clamp-1"
                 >
-                  {modelfile.desc}
+                  {mf.modelfile.desc}
                 </div>
               </div>
             </a>
@@ -153,7 +153,7 @@
                 class="self-center w-fit text-sm px-2 py-2 dark:text-gray-300 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-xl"
                 type="button"
                 href={`/modelfiles/edit?tag=${encodeURIComponent(
-                  modelfile.tagName
+                  mf.tagName
                 )}`}
               >
                 <svg
@@ -177,7 +177,7 @@
                 type="button"
                 on:click={() => {
                   // console.log(modelfile);
-                  sessionStorage.modelfile = JSON.stringify(modelfile);
+                  sessionStorage.modelfile = JSON.stringify(mf.modelfile);
                   goto("/modelfiles/create");
                 }}
               >
@@ -201,7 +201,7 @@
                 class="self-center w-fit text-sm px-2 py-2 dark:text-gray-300 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-xl"
                 type="button"
                 on:click={() => {
-                  shareModelfile(modelfile);
+                  shareModelfile(mf.modelfile);
                 }}
               >
                 <svg
@@ -224,7 +224,7 @@
                 class="self-center w-fit text-sm px-2 py-2 dark:text-gray-300 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-xl"
                 type="button"
                 on:click={() => {
-                  deleteModelfile(modelfile.tagName);
+                  deleteModelfile(mf);
                 }}
               >
                 <svg
