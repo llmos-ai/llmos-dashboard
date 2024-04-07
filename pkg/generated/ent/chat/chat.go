@@ -31,11 +31,17 @@ const (
 	FieldID = "id"
 	// FieldTitle holds the string denoting the title field in the database.
 	FieldTitle = "title"
-	// FieldUserID holds the string denoting the user_id field in the database.
-	FieldUserID = "user_id"
-	// FieldChat holds the string denoting the chat field in the database.
-	FieldChat = "chat"
-	// FieldCreatedAt holds the string denoting the created_at field in the database.
+	// FieldUserId holds the string denoting the userid field in the database.
+	FieldUserId = "user_id"
+	// FieldModels holds the string denoting the models field in the database.
+	FieldModels = "models"
+	// FieldTags holds the string denoting the tags field in the database.
+	FieldTags = "tags"
+	// FieldHistory holds the string denoting the history field in the database.
+	FieldHistory = "history"
+	// FieldMessages holds the string denoting the messages field in the database.
+	FieldMessages = "messages"
+	// FieldCreatedAt holds the string denoting the createdat field in the database.
 	FieldCreatedAt = "created_at"
 	// EdgeOwner holds the string denoting the owner edge name in mutations.
 	EdgeOwner = "owner"
@@ -54,8 +60,11 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldTitle,
-	FieldUserID,
-	FieldChat,
+	FieldUserId,
+	FieldModels,
+	FieldTags,
+	FieldHistory,
+	FieldMessages,
 	FieldCreatedAt,
 }
 
@@ -72,7 +81,7 @@ func ValidColumn(column string) bool {
 var (
 	// TitleValidator is a validator for the "title" field. It is called by the builders before save.
 	TitleValidator func(string) error
-	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
+	// DefaultCreatedAt holds the default value on creation for the "createdAt" field.
 	DefaultCreatedAt time.Time
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
@@ -91,17 +100,12 @@ func ByTitle(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldTitle, opts...).ToFunc()
 }
 
-// ByUserID orders the results by the user_id field.
-func ByUserID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUserID, opts...).ToFunc()
+// ByUserId orders the results by the userId field.
+func ByUserId(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUserId, opts...).ToFunc()
 }
 
-// ByChat orders the results by the chat field.
-func ByChat(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldChat, opts...).ToFunc()
-}
-
-// ByCreatedAt orders the results by the created_at field.
+// ByCreatedAt orders the results by the createdAt field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
 }

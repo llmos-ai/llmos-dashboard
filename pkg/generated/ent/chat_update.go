@@ -23,11 +23,13 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+	"entgo.io/ent/dialect/sql/sqljson"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/chat"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/predicate"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/user"
+	v1 "github.com/llmos-ai/llmos-dashboard/pkg/types/v1"
 )
 
 // ChatUpdate is the builder for updating Chat entities.
@@ -57,31 +59,67 @@ func (cu *ChatUpdate) SetNillableTitle(s *string) *ChatUpdate {
 	return cu
 }
 
-// SetUserID sets the "user_id" field.
-func (cu *ChatUpdate) SetUserID(u uuid.UUID) *ChatUpdate {
-	cu.mutation.SetUserID(u)
+// SetUserId sets the "userId" field.
+func (cu *ChatUpdate) SetUserId(u uuid.UUID) *ChatUpdate {
+	cu.mutation.SetUserId(u)
 	return cu
 }
 
-// SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (cu *ChatUpdate) SetNillableUserID(u *uuid.UUID) *ChatUpdate {
+// SetNillableUserId sets the "userId" field if the given value is not nil.
+func (cu *ChatUpdate) SetNillableUserId(u *uuid.UUID) *ChatUpdate {
 	if u != nil {
-		cu.SetUserID(*u)
+		cu.SetUserId(*u)
 	}
 	return cu
 }
 
-// SetChat sets the "chat" field.
-func (cu *ChatUpdate) SetChat(s string) *ChatUpdate {
-	cu.mutation.SetChat(s)
+// SetModels sets the "models" field.
+func (cu *ChatUpdate) SetModels(s []string) *ChatUpdate {
+	cu.mutation.SetModels(s)
 	return cu
 }
 
-// SetNillableChat sets the "chat" field if the given value is not nil.
-func (cu *ChatUpdate) SetNillableChat(s *string) *ChatUpdate {
-	if s != nil {
-		cu.SetChat(*s)
+// AppendModels appends s to the "models" field.
+func (cu *ChatUpdate) AppendModels(s []string) *ChatUpdate {
+	cu.mutation.AppendModels(s)
+	return cu
+}
+
+// SetTags sets the "tags" field.
+func (cu *ChatUpdate) SetTags(s []string) *ChatUpdate {
+	cu.mutation.SetTags(s)
+	return cu
+}
+
+// AppendTags appends s to the "tags" field.
+func (cu *ChatUpdate) AppendTags(s []string) *ChatUpdate {
+	cu.mutation.AppendTags(s)
+	return cu
+}
+
+// SetHistory sets the "history" field.
+func (cu *ChatUpdate) SetHistory(v v1.Histroy) *ChatUpdate {
+	cu.mutation.SetHistory(v)
+	return cu
+}
+
+// SetNillableHistory sets the "history" field if the given value is not nil.
+func (cu *ChatUpdate) SetNillableHistory(v *v1.Histroy) *ChatUpdate {
+	if v != nil {
+		cu.SetHistory(*v)
 	}
+	return cu
+}
+
+// SetMessages sets the "messages" field.
+func (cu *ChatUpdate) SetMessages(v []v1.Message) *ChatUpdate {
+	cu.mutation.SetMessages(v)
+	return cu
+}
+
+// AppendMessages appends v to the "messages" field.
+func (cu *ChatUpdate) AppendMessages(v []v1.Message) *ChatUpdate {
+	cu.mutation.AppendMessages(v)
 	return cu
 }
 
@@ -162,8 +200,32 @@ func (cu *ChatUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := cu.mutation.Title(); ok {
 		_spec.SetField(chat.FieldTitle, field.TypeString, value)
 	}
-	if value, ok := cu.mutation.Chat(); ok {
-		_spec.SetField(chat.FieldChat, field.TypeString, value)
+	if value, ok := cu.mutation.Models(); ok {
+		_spec.SetField(chat.FieldModels, field.TypeJSON, value)
+	}
+	if value, ok := cu.mutation.AppendedModels(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, chat.FieldModels, value)
+		})
+	}
+	if value, ok := cu.mutation.Tags(); ok {
+		_spec.SetField(chat.FieldTags, field.TypeJSON, value)
+	}
+	if value, ok := cu.mutation.AppendedTags(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, chat.FieldTags, value)
+		})
+	}
+	if value, ok := cu.mutation.History(); ok {
+		_spec.SetField(chat.FieldHistory, field.TypeJSON, value)
+	}
+	if value, ok := cu.mutation.Messages(); ok {
+		_spec.SetField(chat.FieldMessages, field.TypeJSON, value)
+	}
+	if value, ok := cu.mutation.AppendedMessages(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, chat.FieldMessages, value)
+		})
 	}
 	if cu.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -228,31 +290,67 @@ func (cuo *ChatUpdateOne) SetNillableTitle(s *string) *ChatUpdateOne {
 	return cuo
 }
 
-// SetUserID sets the "user_id" field.
-func (cuo *ChatUpdateOne) SetUserID(u uuid.UUID) *ChatUpdateOne {
-	cuo.mutation.SetUserID(u)
+// SetUserId sets the "userId" field.
+func (cuo *ChatUpdateOne) SetUserId(u uuid.UUID) *ChatUpdateOne {
+	cuo.mutation.SetUserId(u)
 	return cuo
 }
 
-// SetNillableUserID sets the "user_id" field if the given value is not nil.
-func (cuo *ChatUpdateOne) SetNillableUserID(u *uuid.UUID) *ChatUpdateOne {
+// SetNillableUserId sets the "userId" field if the given value is not nil.
+func (cuo *ChatUpdateOne) SetNillableUserId(u *uuid.UUID) *ChatUpdateOne {
 	if u != nil {
-		cuo.SetUserID(*u)
+		cuo.SetUserId(*u)
 	}
 	return cuo
 }
 
-// SetChat sets the "chat" field.
-func (cuo *ChatUpdateOne) SetChat(s string) *ChatUpdateOne {
-	cuo.mutation.SetChat(s)
+// SetModels sets the "models" field.
+func (cuo *ChatUpdateOne) SetModels(s []string) *ChatUpdateOne {
+	cuo.mutation.SetModels(s)
 	return cuo
 }
 
-// SetNillableChat sets the "chat" field if the given value is not nil.
-func (cuo *ChatUpdateOne) SetNillableChat(s *string) *ChatUpdateOne {
-	if s != nil {
-		cuo.SetChat(*s)
+// AppendModels appends s to the "models" field.
+func (cuo *ChatUpdateOne) AppendModels(s []string) *ChatUpdateOne {
+	cuo.mutation.AppendModels(s)
+	return cuo
+}
+
+// SetTags sets the "tags" field.
+func (cuo *ChatUpdateOne) SetTags(s []string) *ChatUpdateOne {
+	cuo.mutation.SetTags(s)
+	return cuo
+}
+
+// AppendTags appends s to the "tags" field.
+func (cuo *ChatUpdateOne) AppendTags(s []string) *ChatUpdateOne {
+	cuo.mutation.AppendTags(s)
+	return cuo
+}
+
+// SetHistory sets the "history" field.
+func (cuo *ChatUpdateOne) SetHistory(v v1.Histroy) *ChatUpdateOne {
+	cuo.mutation.SetHistory(v)
+	return cuo
+}
+
+// SetNillableHistory sets the "history" field if the given value is not nil.
+func (cuo *ChatUpdateOne) SetNillableHistory(v *v1.Histroy) *ChatUpdateOne {
+	if v != nil {
+		cuo.SetHistory(*v)
 	}
+	return cuo
+}
+
+// SetMessages sets the "messages" field.
+func (cuo *ChatUpdateOne) SetMessages(v []v1.Message) *ChatUpdateOne {
+	cuo.mutation.SetMessages(v)
+	return cuo
+}
+
+// AppendMessages appends v to the "messages" field.
+func (cuo *ChatUpdateOne) AppendMessages(v []v1.Message) *ChatUpdateOne {
+	cuo.mutation.AppendMessages(v)
 	return cuo
 }
 
@@ -363,8 +461,32 @@ func (cuo *ChatUpdateOne) sqlSave(ctx context.Context) (_node *Chat, err error) 
 	if value, ok := cuo.mutation.Title(); ok {
 		_spec.SetField(chat.FieldTitle, field.TypeString, value)
 	}
-	if value, ok := cuo.mutation.Chat(); ok {
-		_spec.SetField(chat.FieldChat, field.TypeString, value)
+	if value, ok := cuo.mutation.Models(); ok {
+		_spec.SetField(chat.FieldModels, field.TypeJSON, value)
+	}
+	if value, ok := cuo.mutation.AppendedModels(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, chat.FieldModels, value)
+		})
+	}
+	if value, ok := cuo.mutation.Tags(); ok {
+		_spec.SetField(chat.FieldTags, field.TypeJSON, value)
+	}
+	if value, ok := cuo.mutation.AppendedTags(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, chat.FieldTags, value)
+		})
+	}
+	if value, ok := cuo.mutation.History(); ok {
+		_spec.SetField(chat.FieldHistory, field.TypeJSON, value)
+	}
+	if value, ok := cuo.mutation.Messages(); ok {
+		_spec.SetField(chat.FieldMessages, field.TypeJSON, value)
+	}
+	if value, ok := cuo.mutation.AppendedMessages(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, chat.FieldMessages, value)
+		})
 	}
 	if cuo.mutation.OwnerCleared() {
 		edge := &sqlgraph.EdgeSpec{

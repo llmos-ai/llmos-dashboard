@@ -38,9 +38,9 @@ const (
 	FieldPassword = "password"
 	// FieldRole holds the string denoting the role field in the database.
 	FieldRole = "role"
-	// FieldProfileImageURL holds the string denoting the profile_image_url field in the database.
-	FieldProfileImageURL = "profile_image_url"
-	// FieldCreatedAt holds the string denoting the created_at field in the database.
+	// FieldProfileImageUrl holds the string denoting the profileimageurl field in the database.
+	FieldProfileImageUrl = "profile_image_url"
+	// FieldCreatedAt holds the string denoting the createdat field in the database.
 	FieldCreatedAt = "created_at"
 	// EdgeChats holds the string denoting the chats edge name in mutations.
 	EdgeChats = "chats"
@@ -71,7 +71,7 @@ var Columns = []string{
 	FieldEmail,
 	FieldPassword,
 	FieldRole,
-	FieldProfileImageURL,
+	FieldProfileImageUrl,
 	FieldCreatedAt,
 }
 
@@ -92,9 +92,9 @@ var (
 	EmailValidator func(string) error
 	// PasswordValidator is a validator for the "password" field. It is called by the builders before save.
 	PasswordValidator func(string) error
-	// DefaultProfileImageURL holds the default value on creation for the "profile_image_url" field.
-	DefaultProfileImageURL string
-	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
+	// DefaultProfileImageUrl holds the default value on creation for the "profileImageUrl" field.
+	DefaultProfileImageUrl string
+	// DefaultCreatedAt holds the default value on creation for the "createdAt" field.
 	DefaultCreatedAt time.Time
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
@@ -155,12 +155,12 @@ func ByRole(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRole, opts...).ToFunc()
 }
 
-// ByProfileImageURL orders the results by the profile_image_url field.
-func ByProfileImageURL(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldProfileImageURL, opts...).ToFunc()
+// ByProfileImageUrl orders the results by the profileImageUrl field.
+func ByProfileImageUrl(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldProfileImageUrl, opts...).ToFunc()
 }
 
-// ByCreatedAt orders the results by the created_at field.
+// ByCreatedAt orders the results by the createdAt field.
 func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
 }

@@ -100,16 +100,16 @@ func (uu *UserUpdate) SetNillableRole(u *user.Role) *UserUpdate {
 	return uu
 }
 
-// SetProfileImageURL sets the "profile_image_url" field.
-func (uu *UserUpdate) SetProfileImageURL(s string) *UserUpdate {
-	uu.mutation.SetProfileImageURL(s)
+// SetProfileImageUrl sets the "profileImageUrl" field.
+func (uu *UserUpdate) SetProfileImageUrl(s string) *UserUpdate {
+	uu.mutation.SetProfileImageUrl(s)
 	return uu
 }
 
-// SetNillableProfileImageURL sets the "profile_image_url" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableProfileImageURL(s *string) *UserUpdate {
+// SetNillableProfileImageUrl sets the "profileImageUrl" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableProfileImageUrl(s *string) *UserUpdate {
 	if s != nil {
-		uu.SetProfileImageURL(*s)
+		uu.SetProfileImageUrl(*s)
 	}
 	return uu
 }
@@ -267,8 +267,8 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := uu.mutation.Role(); ok {
 		_spec.SetField(user.FieldRole, field.TypeEnum, value)
 	}
-	if value, ok := uu.mutation.ProfileImageURL(); ok {
-		_spec.SetField(user.FieldProfileImageURL, field.TypeString, value)
+	if value, ok := uu.mutation.ProfileImageUrl(); ok {
+		_spec.SetField(user.FieldProfileImageUrl, field.TypeString, value)
 	}
 	if uu.mutation.ChatsCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -436,16 +436,16 @@ func (uuo *UserUpdateOne) SetNillableRole(u *user.Role) *UserUpdateOne {
 	return uuo
 }
 
-// SetProfileImageURL sets the "profile_image_url" field.
-func (uuo *UserUpdateOne) SetProfileImageURL(s string) *UserUpdateOne {
-	uuo.mutation.SetProfileImageURL(s)
+// SetProfileImageUrl sets the "profileImageUrl" field.
+func (uuo *UserUpdateOne) SetProfileImageUrl(s string) *UserUpdateOne {
+	uuo.mutation.SetProfileImageUrl(s)
 	return uuo
 }
 
-// SetNillableProfileImageURL sets the "profile_image_url" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableProfileImageURL(s *string) *UserUpdateOne {
+// SetNillableProfileImageUrl sets the "profileImageUrl" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableProfileImageUrl(s *string) *UserUpdateOne {
 	if s != nil {
-		uuo.SetProfileImageURL(*s)
+		uuo.SetProfileImageUrl(*s)
 	}
 	return uuo
 }
@@ -633,8 +633,8 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	if value, ok := uuo.mutation.Role(); ok {
 		_spec.SetField(user.FieldRole, field.TypeEnum, value)
 	}
-	if value, ok := uuo.mutation.ProfileImageURL(); ok {
-		_spec.SetField(user.FieldProfileImageURL, field.TypeString, value)
+	if value, ok := uuo.mutation.ProfileImageUrl(); ok {
+		_spec.SetField(user.FieldProfileImageUrl, field.TypeString, value)
 	}
 	if uuo.mutation.ChatsCleared() {
 		edge := &sqlgraph.EdgeSpec{

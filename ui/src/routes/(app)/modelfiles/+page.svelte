@@ -201,29 +201,6 @@
                 class="self-center w-fit text-sm px-2 py-2 dark:text-gray-300 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-xl"
                 type="button"
                 on:click={() => {
-                  shareModelfile(mf.modelfile);
-                }}
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke-width="1.5"
-                  stroke="currentColor"
-                  class="w-4 h-4"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"
-                  />
-                </svg>
-              </button>
-
-              <button
-                class="self-center w-fit text-sm px-2 py-2 dark:text-gray-300 dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 rounded-xl"
-                type="button"
-                on:click={() => {
                   deleteModelfile(mf);
                 }}
               >
@@ -411,44 +388,6 @@
             </div>
           </div>
         {/if}
-      </div>
-
-      <div class=" my-16">
-        <div class=" text-2xl font-semibold mb-3">
-          {$i18n.t("Made by OpenWebUI Community")}
-        </div>
-
-        <a
-          class=" flex space-x-4 cursor-pointer w-full mb-2 px-3 py-2"
-          href="https://openwebui.com/"
-          target="_blank"
-        >
-          <div class=" self-center w-10">
-            <div
-              class="w-full h-10 flex justify-center rounded-full bg-transparent dark:bg-gray-700 border border-dashed border-gray-200"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                class="w-6"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M12 3.75a.75.75 0 01.75.75v6.75h6.75a.75.75 0 010 1.5h-6.75v6.75a.75.75 0 01-1.5 0v-6.75H4.5a.75.75 0 010-1.5h6.75V4.5a.75.75 0 01.75-.75z"
-                  clip-rule="evenodd"
-                />
-              </svg>
-            </div>
-          </div>
-
-          <div class=" self-center">
-            <div class=" font-bold">{$i18n.t("Discover a modelfile")}</div>
-            <div class=" text-sm">
-              {$i18n.t("Discover, download, and explore model presets")}
-            </div>
-          </div>
-        </a>
       </div>
     </div>
   </div>

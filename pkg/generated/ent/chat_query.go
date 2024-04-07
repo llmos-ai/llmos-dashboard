@@ -419,7 +419,7 @@ func (cq *ChatQuery) loadOwner(ctx context.Context, query *UserQuery, nodes []*C
 	ids := make([]uuid.UUID, 0, len(nodes))
 	nodeids := make(map[uuid.UUID][]*Chat)
 	for i := range nodes {
-		fk := nodes[i].UserID
+		fk := nodes[i].UserId
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -436,7 +436,7 @@ func (cq *ChatQuery) loadOwner(ctx context.Context, query *UserQuery, nodes []*C
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "user_id" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "userId" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -471,7 +471,7 @@ func (cq *ChatQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 		if cq.withOwner != nil {
-			_spec.Node.AddColumnOnce(chat.FieldUserID)
+			_spec.Node.AddColumnOnce(chat.FieldUserId)
 		}
 	}
 	if ps := cq.predicates; len(ps) > 0 {

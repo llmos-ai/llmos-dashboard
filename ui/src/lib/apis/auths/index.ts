@@ -108,7 +108,7 @@ export const updateUserProfile = async (
     },
     body: JSON.stringify({
       name: name,
-      profile_image_url: profileImageUrl,
+      profileImageUrl: profileImageUrl,
     }),
   })
     .then(async (res) => {

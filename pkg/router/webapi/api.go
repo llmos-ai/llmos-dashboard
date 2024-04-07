@@ -25,7 +25,7 @@ func RegisterWebApi(r *gin.Engine, client *ent.Client, ctx context.Context) erro
 
 		// Chat API
 		api.GET("/chats/tags/all", ListChatTags)
-		api.GET("/chats/", chatHandler.ListUserChats)
+		api.GET("/chats/", chatHandler.GetUserChats)
 		api.POST("/chats/new", chatHandler.CreateChat)
 		api.GET("/chats/:id", chatHandler.GetChatByID)
 		api.POST("/chats/:id", chatHandler.UpdateChatByID)

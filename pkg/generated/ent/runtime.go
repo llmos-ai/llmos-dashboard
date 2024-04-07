@@ -36,9 +36,9 @@ func init() {
 	chatDescTitle := chatFields[1].Descriptor()
 	// chat.TitleValidator is a validator for the "title" field. It is called by the builders before save.
 	chat.TitleValidator = chatDescTitle.Validators[0].(func(string) error)
-	// chatDescCreatedAt is the schema descriptor for created_at field.
-	chatDescCreatedAt := chatFields[4].Descriptor()
-	// chat.DefaultCreatedAt holds the default value on creation for the created_at field.
+	// chatDescCreatedAt is the schema descriptor for createdAt field.
+	chatDescCreatedAt := chatFields[7].Descriptor()
+	// chat.DefaultCreatedAt holds the default value on creation for the createdAt field.
 	chat.DefaultCreatedAt = chatDescCreatedAt.Default.(time.Time)
 	// chatDescID is the schema descriptor for id field.
 	chatDescID := chatFields[0].Descriptor()
@@ -78,13 +78,13 @@ func init() {
 	userDescPassword := userFields[3].Descriptor()
 	// user.PasswordValidator is a validator for the "password" field. It is called by the builders before save.
 	user.PasswordValidator = userDescPassword.Validators[0].(func(string) error)
-	// userDescProfileImageURL is the schema descriptor for profile_image_url field.
-	userDescProfileImageURL := userFields[5].Descriptor()
-	// user.DefaultProfileImageURL holds the default value on creation for the profile_image_url field.
-	user.DefaultProfileImageURL = userDescProfileImageURL.Default.(string)
-	// userDescCreatedAt is the schema descriptor for created_at field.
+	// userDescProfileImageUrl is the schema descriptor for profileImageUrl field.
+	userDescProfileImageUrl := userFields[5].Descriptor()
+	// user.DefaultProfileImageUrl holds the default value on creation for the profileImageUrl field.
+	user.DefaultProfileImageUrl = userDescProfileImageUrl.Default.(string)
+	// userDescCreatedAt is the schema descriptor for createdAt field.
 	userDescCreatedAt := userFields[6].Descriptor()
-	// user.DefaultCreatedAt holds the default value on creation for the created_at field.
+	// user.DefaultCreatedAt holds the default value on creation for the createdAt field.
 	user.DefaultCreatedAt = userDescCreatedAt.Default.(time.Time)
 	// userDescID is the schema descriptor for id field.
 	userDescID := userFields[0].Descriptor()

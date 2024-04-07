@@ -37,16 +37,16 @@
     }
   };
 
-  const editUserPasswordHandler = async (id, password) => {
-    const res = await deleteUserById(localStorage.token, id).catch((error) => {
-      toast.error(error);
-      return null;
-    });
-    if (res) {
-      users = await getUsers(localStorage.token);
-      toast.success($i18n.t("Successfully updated."));
-    }
-  };
+  // const editUserPasswordHandler = async (id, password) => {
+  //   const res = await deleteUserById(localStorage.token, id).catch((error) => {
+  //     toast.error(error);
+  //     return null;
+  //   });
+  //   if (res) {
+  //     users = await getUsers(localStorage.token);
+  //     toast.success($i18n.t("Successfully updated."));
+  //   }
+  // };
 
   const deleteUserHandler = async (id) => {
     const res = await deleteUserById(localStorage.token, id).catch((error) => {
@@ -194,7 +194,7 @@
                         <div class="flex flex-row w-max">
                           <img
                             class=" rounded-full w-6 h-6 object-cover mr-2.5"
-                            src={user.profile_image_url}
+                            src={user.profileImageUrl}
                             alt="user"
                           />
 

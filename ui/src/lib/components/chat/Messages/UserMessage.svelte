@@ -58,7 +58,7 @@
     src={message.user
       ? $modelfiles.find((modelfile) => modelfile.tagName === message.user)
           ?.imageUrl ?? "/user.png"
-      : user?.profile_image_url ?? "/user.png"}
+      : user?.profileImageUrl ?? "/user.png"}
   />
 
   <div class="w-full overflow-hidden">

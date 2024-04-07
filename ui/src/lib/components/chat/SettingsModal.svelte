@@ -5,7 +5,6 @@
 
   import { getOllamaModels } from "$lib/apis/ollama";
   import { getOpenAIModels } from "$lib/apis/openai";
-  import { getLiteLLMModels } from "$lib/apis/litellm";
 
   import Modal from "../common/Modal.svelte";
   import Account from "./Settings/Account.svelte";

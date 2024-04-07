@@ -11,9 +11,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
-	"github.com/llmos-ai/llmos-dashboard/pkg/constant"
 	entv1 "github.com/llmos-ai/llmos-dashboard/pkg/generated/ent"
 	entv1User "github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/user"
+
+	"github.com/llmos-ai/llmos-dashboard/pkg/constant"
 	"github.com/llmos-ai/llmos-dashboard/pkg/utils"
 )
 
@@ -38,7 +39,7 @@ type UpdateUser struct {
 	Email           string  `json:"email" binding:"required"`
 	Name            string  `json:"name" binding:"required"`
 	Password        *string `json:"password"`
-	ProfileImageURL string  `json:"profile_image_url"`
+	ProfileImageUrl string  `json:"profileImageUrl"`
 }
 
 type Handler struct {
@@ -78,13 +79,13 @@ func (h *Handler) SignIn(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"token":             tokenStr,
-		"token_type":        tokenType,
-		"id":                user.ID,
-		"email":             user.Email,
-		"name":              user.Name,
-		"role":              user.Role,
-		"profile_image_url": user.ProfileImageURL,
+		"token":           tokenStr,
+		"tokenType":       tokenType,
+		"id":              user.ID,
+		"email":           user.Email,
+		"name":            user.Name,
+		"role":            user.Role,
+		"profileImageUrl": user.ProfileImageUrl,
 	})
 }
 
@@ -117,7 +118,7 @@ func (h *Handler) SignUp(c *gin.Context) {
 		Email:           s.Email,
 		Password:        hashPw,
 		Role:            role,
-		ProfileImageURL: "/user.png",
+		ProfileImageUrl: "/user.png",
 	}
 
 	slog.Debug("signup info", s)
@@ -135,13 +136,13 @@ func (h *Handler) SignUp(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"token":             tokenStr,
-		"token_type":        tokenType,
-		"id":                user.ID,
-		"email":             user.Email,
-		"name":              user.Name,
-		"role":              user.Role,
-		"profile_image_url": user.ProfileImageURL,
+		"token":           tokenStr,
+		"tokenType":       tokenType,
+		"id":              user.ID,
+		"email":           user.Email,
+		"name":            user.Name,
+		"role":            user.Role,
+		"profileImageUrl": user.ProfileImageUrl,
 	})
 }
 
@@ -152,11 +153,11 @@ func (h *Handler) GetAuthorizedUser(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{
-		"id":                user.ID,
-		"email":             user.Email,
-		"name":              user.Name,
-		"role":              user.Role,
-		"profile_image_url": user.ProfileImageURL,
+		"id":              user.ID,
+		"email":           user.Email,
+		"name":            user.Name,
+		"role":            user.Role,
+		"profileImageUrl": user.ProfileImageUrl,
 	})
 }
 

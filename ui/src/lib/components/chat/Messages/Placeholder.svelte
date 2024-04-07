@@ -58,12 +58,12 @@
     >
       {#if modelfile}
         <span class=" capitalize">
-          {modelfile.title}
+          {modelfile.modelfile.title}
         </span>
         <div
           class="mt-0.5 text-base font-normal text-gray-600 dark:text-gray-400"
         >
-          {modelfile.desc}
+          {modelfile.modelfile.desc}
         </div>
         {#if modelfile.user}
           <div

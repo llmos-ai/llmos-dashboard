@@ -69,27 +69,27 @@ func (uc *UserCreate) SetNillableRole(u *user.Role) *UserCreate {
 	return uc
 }
 
-// SetProfileImageURL sets the "profile_image_url" field.
-func (uc *UserCreate) SetProfileImageURL(s string) *UserCreate {
-	uc.mutation.SetProfileImageURL(s)
+// SetProfileImageUrl sets the "profileImageUrl" field.
+func (uc *UserCreate) SetProfileImageUrl(s string) *UserCreate {
+	uc.mutation.SetProfileImageUrl(s)
 	return uc
 }
 
-// SetNillableProfileImageURL sets the "profile_image_url" field if the given value is not nil.
-func (uc *UserCreate) SetNillableProfileImageURL(s *string) *UserCreate {
+// SetNillableProfileImageUrl sets the "profileImageUrl" field if the given value is not nil.
+func (uc *UserCreate) SetNillableProfileImageUrl(s *string) *UserCreate {
 	if s != nil {
-		uc.SetProfileImageURL(*s)
+		uc.SetProfileImageUrl(*s)
 	}
 	return uc
 }
 
-// SetCreatedAt sets the "created_at" field.
+// SetCreatedAt sets the "createdAt" field.
 func (uc *UserCreate) SetCreatedAt(t time.Time) *UserCreate {
 	uc.mutation.SetCreatedAt(t)
 	return uc
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+// SetNillableCreatedAt sets the "createdAt" field if the given value is not nil.
 func (uc *UserCreate) SetNillableCreatedAt(t *time.Time) *UserCreate {
 	if t != nil {
 		uc.SetCreatedAt(*t)
@@ -180,9 +180,9 @@ func (uc *UserCreate) defaults() {
 		v := user.DefaultRole
 		uc.mutation.SetRole(v)
 	}
-	if _, ok := uc.mutation.ProfileImageURL(); !ok {
-		v := user.DefaultProfileImageURL
-		uc.mutation.SetProfileImageURL(v)
+	if _, ok := uc.mutation.ProfileImageUrl(); !ok {
+		v := user.DefaultProfileImageUrl
+		uc.mutation.SetProfileImageUrl(v)
 	}
 	if _, ok := uc.mutation.CreatedAt(); !ok {
 		v := user.DefaultCreatedAt
@@ -228,11 +228,11 @@ func (uc *UserCreate) check() error {
 			return &ValidationError{Name: "role", err: fmt.Errorf(`ent: validator failed for field "User.role": %w`, err)}
 		}
 	}
-	if _, ok := uc.mutation.ProfileImageURL(); !ok {
-		return &ValidationError{Name: "profile_image_url", err: errors.New(`ent: missing required field "User.profile_image_url"`)}
+	if _, ok := uc.mutation.ProfileImageUrl(); !ok {
+		return &ValidationError{Name: "profileImageUrl", err: errors.New(`ent: missing required field "User.profileImageUrl"`)}
 	}
 	if _, ok := uc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "User.created_at"`)}
+		return &ValidationError{Name: "createdAt", err: errors.New(`ent: missing required field "User.createdAt"`)}
 	}
 	return nil
 }
@@ -285,9 +285,9 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		_spec.SetField(user.FieldRole, field.TypeEnum, value)
 		_node.Role = value
 	}
-	if value, ok := uc.mutation.ProfileImageURL(); ok {
-		_spec.SetField(user.FieldProfileImageURL, field.TypeString, value)
-		_node.ProfileImageURL = value
+	if value, ok := uc.mutation.ProfileImageUrl(); ok {
+		_spec.SetField(user.FieldProfileImageUrl, field.TypeString, value)
+		_node.ProfileImageUrl = value
 	}
 	if value, ok := uc.mutation.CreatedAt(); ok {
 		_spec.SetField(user.FieldCreatedAt, field.TypeTime, value)
