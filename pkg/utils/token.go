@@ -18,8 +18,6 @@ type Claims struct {
 
 const issuer = "llmos-issuer"
 
-var jwtKey = []byte("llmos_dashboard_key")
-
 func GenerateToken(uuid uuid.UUID) (string, error) {
 	duration, err := time.ParseDuration(settings.TokenExpireTime.Get())
 	if err != nil {
@@ -36,7 +34,7 @@ func GenerateToken(uuid uuid.UUID) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	ss, err := token.SignedString(jwtKey)
+	ss, err := token.SignedString([]byte(settings.JWTSecret.Get()))
 	if err != nil {
 		return "", err
 	}
@@ -47,7 +45,7 @@ func GenerateToken(uuid uuid.UUID) (string, error) {
 func VerifyToken(tokenStr string) (*Claims, error) {
 	claims := &Claims{}
 	token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
-		return jwtKey, nil
+		return []byte(settings.JWTSecret.Get()), nil
 	})
 
 	if err != nil {

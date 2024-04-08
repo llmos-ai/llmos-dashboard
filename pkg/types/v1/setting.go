@@ -17,7 +17,7 @@ type Setting struct {
 func (Setting) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name").NotEmpty().Unique(),
-		field.String("default").Default("").NotEmpty(),
+		field.String("default").Optional(),
 		field.String("value").Optional(),
 		field.Bool("isActive").StorageKey("is_active").Default(true),
 		field.Bool("readOnly").StorageKey("read_only").Default(false),

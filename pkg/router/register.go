@@ -23,7 +23,7 @@ var registeredRouters = []RegisterRouter{
 	setting.Register,
 }
 
-func RegisterRouters(r *gin.Engine, c *ent.Client, ctx context.Context) {
+func RegisterRouters(r *gin.Engine, c *ent.Client, ctx context.Context) error {
 
 	// enable CORS for all origins
 	r.Use(CORSMiddleware())
@@ -35,6 +35,10 @@ func RegisterRouters(r *gin.Engine, c *ent.Client, ctx context.Context) {
 	r.GET("api/changelog", GetChangelog)
 
 	for _, router := range registeredRouters {
-		router(r, c, ctx)
+		err := router(r, c, ctx)
+		if err != nil {
+			return err
+		}
 	}
+	return nil
 }

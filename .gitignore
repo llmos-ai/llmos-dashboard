@@ -3,5 +3,5 @@ build
 vendor
 ui/.svelte-kit
 vite.config.ts.timestamp*
-llmos-ui.db
+llmos-dashboard.db
 webui.db

@@ -1564,9 +1564,22 @@ func (m *SettingMutation) OldDefault(ctx context.Context) (v string, err error) 
 	return oldValue.Default, nil
 }
 
+// ClearDefault clears the value of the "default" field.
+func (m *SettingMutation) ClearDefault() {
+	m._default = nil
+	m.clearedFields[setting.FieldDefault] = struct{}{}
+}
+
+// DefaultCleared returns if the "default" field was cleared in this mutation.
+func (m *SettingMutation) DefaultCleared() bool {
+	_, ok := m.clearedFields[setting.FieldDefault]
+	return ok
+}
+
 // ResetDefault resets all changes to the "default" field.
 func (m *SettingMutation) ResetDefault() {
 	m._default = nil
+	delete(m.clearedFields, setting.FieldDefault)
 }
 
 // SetValue sets the "value" field.
@@ -1901,6 +1914,9 @@ func (m *SettingMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *SettingMutation) ClearedFields() []string {
 	var fields []string
+	if m.FieldCleared(setting.FieldDefault) {
+		fields = append(fields, setting.FieldDefault)
+	}
 	if m.FieldCleared(setting.FieldValue) {
 		fields = append(fields, setting.FieldValue)
 	}
@@ -1918,6 +1934,9 @@ func (m *SettingMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *SettingMutation) ClearField(name string) error {
 	switch name {
+	case setting.FieldDefault:
+		m.ClearDefault()
+		return nil
 	case setting.FieldValue:
 		m.ClearValue()
 		return nil

@@ -147,10 +147,6 @@ func (sc *SettingCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (sc *SettingCreate) defaults() {
-	if _, ok := sc.mutation.Default(); !ok {
-		v := setting.DefaultDefault
-		sc.mutation.SetDefault(v)
-	}
 	if _, ok := sc.mutation.IsActive(); !ok {
 		v := setting.DefaultIsActive
 		sc.mutation.SetIsActive(v)
@@ -173,14 +169,6 @@ func (sc *SettingCreate) check() error {
 	if v, ok := sc.mutation.Name(); ok {
 		if err := setting.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Setting.name": %w`, err)}
-		}
-	}
-	if _, ok := sc.mutation.Default(); !ok {
-		return &ValidationError{Name: "default", err: errors.New(`ent: missing required field "Setting.default"`)}
-	}
-	if v, ok := sc.mutation.Default(); ok {
-		if err := setting.DefaultValidator(v); err != nil {
-			return &ValidationError{Name: "default", err: fmt.Errorf(`ent: validator failed for field "Setting.default": %w`, err)}
 		}
 	}
 	if _, ok := sc.mutation.IsActive(); !ok {
@@ -319,6 +307,12 @@ func (u *SettingUpsert) UpdateDefault() *SettingUpsert {
 	return u
 }
 
+// ClearDefault clears the value of the "default" field.
+func (u *SettingUpsert) ClearDefault() *SettingUpsert {
+	u.SetNull(setting.FieldDefault)
+	return u
+}
+
 // SetValue sets the "value" field.
 func (u *SettingUpsert) SetValue(v string) *SettingUpsert {
 	u.Set(setting.FieldValue, v)
@@ -431,6 +425,13 @@ func (u *SettingUpsertOne) SetDefault(v string) *SettingUpsertOne {
 func (u *SettingUpsertOne) UpdateDefault() *SettingUpsertOne {
 	return u.Update(func(s *SettingUpsert) {
 		s.UpdateDefault()
+	})
+}
+
+// ClearDefault clears the value of the "default" field.
+func (u *SettingUpsertOne) ClearDefault() *SettingUpsertOne {
+	return u.Update(func(s *SettingUpsert) {
+		s.ClearDefault()
 	})
 }
 
@@ -719,6 +720,13 @@ func (u *SettingUpsertBulk) SetDefault(v string) *SettingUpsertBulk {
 func (u *SettingUpsertBulk) UpdateDefault() *SettingUpsertBulk {
 	return u.Update(func(s *SettingUpsert) {
 		s.UpdateDefault()
+	})
+}
+
+// ClearDefault clears the value of the "default" field.
+func (u *SettingUpsertBulk) ClearDefault() *SettingUpsertBulk {
+	return u.Update(func(s *SettingUpsert) {
+		s.ClearDefault()
 	})
 }
 

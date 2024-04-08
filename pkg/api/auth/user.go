@@ -105,3 +105,14 @@ func (h *Handler) UpdateUserByID(id uuid.UUID, u UpdateUser) (*entv1.User, error
 	}
 	return user, nil
 }
+
+func GetUserRole(role string) user.Role {
+	switch role {
+	case "admin":
+		return user.RoleAdmin
+	case "user":
+		return user.RoleUser
+	default:
+		return user.RolePending
+	}
+}

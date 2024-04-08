@@ -33,7 +33,10 @@ func NewApiServer(ctx context.Context) ApiServer {
 
 func (a ApiServer) ListenAndServe() error {
 	// register routers
-	router.RegisterRouters(a.Engine, a.DBClient, a.Context)
+	err := router.RegisterRouters(a.Engine, a.DBClient, a.Context)
+	if err != nil {
+		return err
+	}
 
 	a.Engine.Run()
 

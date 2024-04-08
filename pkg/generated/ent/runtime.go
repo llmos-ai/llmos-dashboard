@@ -71,12 +71,6 @@ func init() {
 	settingDescName := settingFields[0].Descriptor()
 	// setting.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	setting.NameValidator = settingDescName.Validators[0].(func(string) error)
-	// settingDescDefault is the schema descriptor for default field.
-	settingDescDefault := settingFields[1].Descriptor()
-	// setting.DefaultDefault holds the default value on creation for the default field.
-	setting.DefaultDefault = settingDescDefault.Default.(string)
-	// setting.DefaultValidator is a validator for the "default" field. It is called by the builders before save.
-	setting.DefaultValidator = settingDescDefault.Validators[0].(func(string) error)
 	// settingDescIsActive is the schema descriptor for isActive field.
 	settingDescIsActive := settingFields[3].Descriptor()
 	// setting.DefaultIsActive holds the default value on creation for the isActive field.

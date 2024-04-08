@@ -69,9 +69,13 @@ func validateSettingTokenExpireTime(value string) error {
 }
 
 func validateSettingWebhookURL(value string) error {
+	// allow to reset empty value
+	if value == "" {
+		return nil
+	}
 	_, err := url.ParseRequestURI(value)
 	if err != nil {
-		return fmt.Errorf("invalid url: %s", value)
+		return fmt.Errorf("invalid webhook url: %s", value)
 	}
 	return nil
 }

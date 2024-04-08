@@ -218,6 +218,16 @@ func DefaultHasSuffix(v string) predicate.Setting {
 	return predicate.Setting(sql.FieldHasSuffix(FieldDefault, v))
 }
 
+// DefaultIsNil applies the IsNil predicate on the "default" field.
+func DefaultIsNil() predicate.Setting {
+	return predicate.Setting(sql.FieldIsNull(FieldDefault))
+}
+
+// DefaultNotNil applies the NotNil predicate on the "default" field.
+func DefaultNotNil() predicate.Setting {
+	return predicate.Setting(sql.FieldNotNull(FieldDefault))
+}
+
 // DefaultEqualFold applies the EqualFold predicate on the "default" field.
 func DefaultEqualFold(v string) predicate.Setting {
 	return predicate.Setting(sql.FieldEqualFold(FieldDefault, v))
