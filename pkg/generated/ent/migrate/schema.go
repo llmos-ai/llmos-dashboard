@@ -83,6 +83,29 @@ var (
 			},
 		},
 	}
+	// SettingsColumns holds the columns for the "settings" table.
+	SettingsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "name", Type: field.TypeString, Unique: true},
+		{Name: "default", Type: field.TypeString, Default: ""},
+		{Name: "value", Type: field.TypeString, Nullable: true},
+		{Name: "is_active", Type: field.TypeBool, Default: true},
+		{Name: "read_only", Type: field.TypeBool, Default: false},
+		{Name: "created_at", Type: field.TypeTime},
+	}
+	// SettingsTable holds the schema information for the "settings" table.
+	SettingsTable = &schema.Table{
+		Name:       "settings",
+		Columns:    SettingsColumns,
+		PrimaryKey: []*schema.Column{SettingsColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "setting_name",
+				Unique:  true,
+				Columns: []*schema.Column{SettingsColumns[1]},
+			},
+		},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID, Unique: true},
@@ -115,6 +138,7 @@ var (
 	Tables = []*schema.Table{
 		ChatsTable,
 		ModelfilesTable,
+		SettingsTable,
 		UsersTable,
 	}
 )

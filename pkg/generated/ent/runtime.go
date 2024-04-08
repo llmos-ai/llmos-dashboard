@@ -22,6 +22,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/chat"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/modelfile"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/setting"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/user"
 	v1 "github.com/llmos-ai/llmos-dashboard/pkg/types/v1"
 )
@@ -64,6 +65,30 @@ func init() {
 	modelfileDescID := modelfileFields[0].Descriptor()
 	// modelfile.DefaultID holds the default value on creation for the id field.
 	modelfile.DefaultID = modelfileDescID.Default.(func() uuid.UUID)
+	settingFields := v1.Setting{}.Fields()
+	_ = settingFields
+	// settingDescName is the schema descriptor for name field.
+	settingDescName := settingFields[0].Descriptor()
+	// setting.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	setting.NameValidator = settingDescName.Validators[0].(func(string) error)
+	// settingDescDefault is the schema descriptor for default field.
+	settingDescDefault := settingFields[1].Descriptor()
+	// setting.DefaultDefault holds the default value on creation for the default field.
+	setting.DefaultDefault = settingDescDefault.Default.(string)
+	// setting.DefaultValidator is a validator for the "default" field. It is called by the builders before save.
+	setting.DefaultValidator = settingDescDefault.Validators[0].(func(string) error)
+	// settingDescIsActive is the schema descriptor for isActive field.
+	settingDescIsActive := settingFields[3].Descriptor()
+	// setting.DefaultIsActive holds the default value on creation for the isActive field.
+	setting.DefaultIsActive = settingDescIsActive.Default.(bool)
+	// settingDescReadOnly is the schema descriptor for readOnly field.
+	settingDescReadOnly := settingFields[4].Descriptor()
+	// setting.DefaultReadOnly holds the default value on creation for the readOnly field.
+	setting.DefaultReadOnly = settingDescReadOnly.Default.(bool)
+	// settingDescCreatedAt is the schema descriptor for createdAt field.
+	settingDescCreatedAt := settingFields[5].Descriptor()
+	// setting.DefaultCreatedAt holds the default value on creation for the createdAt field.
+	setting.DefaultCreatedAt = settingDescCreatedAt.Default.(time.Time)
 	userFields := v1.User{}.Fields()
 	_ = userFields
 	// userDescName is the schema descriptor for name field.

@@ -28,6 +28,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/chat"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/modelfile"
+	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/setting"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/user"
 )
 
@@ -91,6 +92,7 @@ func checkColumn(table, column string) error {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			chat.Table:      chat.ValidColumn,
 			modelfile.Table: modelfile.ValidColumn,
+			setting.Table:   setting.ValidColumn,
 			user.Table:      user.ValidColumn,
 		})
 	})

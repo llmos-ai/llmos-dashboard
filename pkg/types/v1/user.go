@@ -8,6 +8,8 @@ import (
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
 	"github.com/google/uuid"
+
+	entv1User "github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/user"
 )
 
 // User holds the schema definition for the User entity.
@@ -42,5 +44,16 @@ func (User) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("name", "email").Unique(),
 		index.Fields("role"),
+	}
+}
+
+func GetUserRole(role string) entv1User.Role {
+	switch role {
+	case "admin":
+		return entv1User.RoleAdmin
+	case "user":
+		return entv1User.RoleUser
+	default:
+		return entv1User.RolePending
 	}
 }

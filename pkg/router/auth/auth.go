@@ -17,7 +17,7 @@ func RegisterAuthRoute(r *gin.Engine, c *ent.Client, ctx context.Context) error 
 	{
 		apiv1.GET("/", auth.GetAuthorizedUser)
 		apiv1.POST("/signin", auth.SignIn)
-		apiv1.POST("/signup", auth.SignUp)
+		apiv1.POST("/signup", auth.SingUpMiddleware, auth.SignUp)
 	}
 	return nil
 }

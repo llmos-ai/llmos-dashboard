@@ -30,6 +30,8 @@ type Tx struct {
 	Chat *ChatClient
 	// Modelfile is the client for interacting with the Modelfile builders.
 	Modelfile *ModelfileClient
+	// Setting is the client for interacting with the Setting builders.
+	Setting *SettingClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 
@@ -165,6 +167,7 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.Chat = NewChatClient(tx.config)
 	tx.Modelfile = NewModelfileClient(tx.config)
+	tx.Setting = NewSettingClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }
 
