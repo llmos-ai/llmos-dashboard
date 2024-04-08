@@ -21,7 +21,7 @@ type User struct {
 	CreatedAt    string `json:"createdAt"`
 }
 
-func (h *Handler) CreateUser(user entv1.User) (*entv1.User, error) {
+func (h *Handler) CreateUser(user *entv1.User) (*entv1.User, error) {
 	slog.Debug("Inserting user record ...", user.Email)
 	createdUser, err := h.client.User.
 		Create().

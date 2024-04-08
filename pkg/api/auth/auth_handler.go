@@ -2,17 +2,16 @@ package auth
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"net/http"
-	"strings"
-	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
 	entv1 "github.com/llmos-ai/llmos-dashboard/pkg/generated/ent"
 	entv1User "github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/user"
+	"github.com/llmos-ai/llmos-dashboard/pkg/settings"
+	v1 "github.com/llmos-ai/llmos-dashboard/pkg/types/v1"
 
 	"github.com/llmos-ai/llmos-dashboard/pkg/constant"
 	"github.com/llmos-ai/llmos-dashboard/pkg/utils"
@@ -70,8 +69,7 @@ func (h *Handler) SignIn(c *gin.Context) {
 		return
 	}
 
-	expiredTime := time.Now().Add(7 * 24 * time.Hour)
-	tokenStr, err := utils.GenerateToken(user.ID, expiredTime)
+	tokenStr, err := utils.GenerateToken(user.ID)
 	if err != nil {
 		slog.Error("failed to generate token", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": constant.MessageErrorGenerateToken})
@@ -92,28 +90,31 @@ func (h *Handler) SignIn(c *gin.Context) {
 func (h *Handler) SignUp(c *gin.Context) {
 	var s SingUp
 	if err := c.ShouldBindJSON(&s); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
 	}
 
 	hashPw, err := utils.HashPassword(s.Password)
 	if err != nil {
 		slog.Error("failed to hash password", err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, constant.MessageErrorHashPassword)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constant.MessageErrorHashPassword})
+		return
 	}
 
-	var role = entv1User.RolePending
+	role := v1.GetUserRole(settings.DefaultUserRole.Get())
 	// always set the first user as the admin user
 	users, err := h.GetAllUser()
 	if err != nil {
 		slog.Error("failed to list users", err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
 	if len(users) == 0 {
 		role = entv1User.RoleAdmin
 	}
 
-	user := entv1.User{
+	user := &entv1.User{
 		Name:            s.Name,
 		Email:           s.Email,
 		Password:        hashPw,
@@ -122,19 +123,21 @@ func (h *Handler) SignUp(c *gin.Context) {
 	}
 
 	slog.Debug("signup info", s)
-	_, err = h.CreateUser(user)
+	user, err = h.CreateUser(user)
 	if err != nil {
 		slog.Error("failed to create user", err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
-	expiredTime := time.Now().Add(7 * 24 * time.Hour)
-	tokenStr, err := utils.GenerateToken(user.ID, expiredTime)
+	tokenStr, err := utils.GenerateToken(user.ID)
 	if err != nil {
 		slog.Error("failed to generate token", err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, constant.MessageErrorGenerateToken)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": constant.MessageErrorGenerateToken})
+		return
 	}
 
+	c.Set("user", user)
 	c.JSON(http.StatusOK, gin.H{
 		"token":           tokenStr,
 		"tokenType":       tokenType,
@@ -149,7 +152,8 @@ func (h *Handler) SignUp(c *gin.Context) {
 func (h *Handler) GetAuthorizedUser(c *gin.Context) {
 	user, err := utils.GetSessionUser(c)
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, err.Error())
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
 	}
 
 	c.JSON(200, gin.H{
@@ -171,48 +175,17 @@ func (h *Handler) ListAllUser(c *gin.Context) {
 	c.JSONP(http.StatusOK, users)
 }
 
-func (h *Handler) AuthMiddleware(c *gin.Context) {
-	slog.Debug("path", c.Request.URL.Path)
-	if strings.Contains(c.Request.URL.Path, "signin") || strings.Contains(c.Request.URL.Path, "signup") {
-		slog.Debug("skipping auth middleware")
-		return
-	}
-
-	tokenString := c.GetHeader("Authorization")
-	if tokenString == "" {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "authorization header is required"})
-		return
-	}
-
-	tokenString = tokenString[len("Bearer "):]
-	claims, err := utils.VerifyToken(tokenString)
-	if err != nil {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid token"})
-		return
-	}
-
-	// if auth exist, find user by token
-	user, err := h.GetUserByID(claims.UUID)
-	if err != nil {
-		slog.Error("failed to get user", err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("failed to get user: %s", err.Error())})
-		return
-	}
-	c.Set("user", user)
-	c.Next()
-}
-
 func (h *Handler) UpdateUserRole(c *gin.Context) {
 	update := UpdateRole{}
 	// using BindJson method to serialize body with struct
 	if err := c.BindJSON(&update); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	user, err := h.UpdateUserRoleByID(update.ID, update.Role)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -235,14 +208,14 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 	update := UpdateUser{}
 	// using BindJson method to serialize body with struct
 	if err = c.BindJSON(&update); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	if update.Password != nil {
 		passwd, err := utils.HashPassword(*update.Password)
 		if err != nil {
-			c.AbortWithError(http.StatusInternalServerError, err)
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 		update.Password = &passwd
@@ -250,7 +223,7 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 
 	user, err := h.UpdateUserByID(uuid, update)
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 

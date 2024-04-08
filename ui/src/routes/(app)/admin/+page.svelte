@@ -7,12 +7,11 @@
   import { toast } from "svelte-sonner";
 
   import { updateUserRole, getUsers, deleteUserById } from "$lib/apis/users";
-  import {
-    getSignUpEnabledStatus,
-    toggleSignUpEnabledStatus,
-  } from "$lib/apis/auths";
   import EditUserModal from "$lib/components/admin/EditUserModal.svelte";
   import SettingsModal from "$lib/components/admin/SettingsModal.svelte";
+
+  // import setting to initialize the local storage of serverSettings
+  import { getAllSettings } from "$lib/apis/settings";
 
   const i18n = getContext("i18n");
 

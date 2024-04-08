@@ -7,6 +7,8 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
+
+	"github.com/llmos-ai/llmos-dashboard/pkg/settings"
 )
 
 type Claims struct {
@@ -18,7 +20,13 @@ const issuer = "llmos-issuer"
 
 var jwtKey = []byte("llmos_dashboard_key")
 
-func GenerateToken(uuid uuid.UUID, time time.Time) (string, error) {
+func GenerateToken(uuid uuid.UUID) (string, error) {
+	duration, err := time.ParseDuration(settings.TokenExpireTime.Get())
+	if err != nil {
+		return "", err
+	}
+	time := time.Now().Add(duration)
+
 	claims := Claims{
 		UUID: uuid,
 		RegisteredClaims: jwt.RegisteredClaims{

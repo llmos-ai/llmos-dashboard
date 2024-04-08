@@ -9,6 +9,7 @@ import (
 	"github.com/llmos-ai/llmos-dashboard/pkg/router/auth"
 	"github.com/llmos-ai/llmos-dashboard/pkg/router/ollama"
 	"github.com/llmos-ai/llmos-dashboard/pkg/router/openai"
+	"github.com/llmos-ai/llmos-dashboard/pkg/router/setting"
 	"github.com/llmos-ai/llmos-dashboard/pkg/router/webapi"
 )
 
@@ -19,6 +20,7 @@ var registeredRouters = []RegisterRouter{
 	openai.RegisterLiteLLM,
 	webapi.RegisterWebApi,
 	ollama.RegisterOllama,
+	setting.Register,
 }
 
 func RegisterRouters(r *gin.Engine, c *ent.Client, ctx context.Context) {
