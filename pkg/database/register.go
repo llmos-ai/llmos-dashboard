@@ -9,7 +9,7 @@ import (
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent"
 )
 
-const dbFileName = "llmos-ui.db"
+const dbFileName = "llmos-dashboard.db"
 
 func RegisterDBClient(ctx context.Context) (*ent.Client, error) {
 	client, err := ent.Open("sqlite3", fmt.Sprintf("file:%s?_fk=1", dbFileName))
@@ -21,4 +21,8 @@ func RegisterDBClient(ctx context.Context) (*ent.Client, error) {
 		return nil, fmt.Errorf("failed creating schema resources: %v", err)
 	}
 	return client, nil
+}
+
+func GetDBFileName() string {
+	return fmt.Sprintf("./%s", dbFileName)
 }

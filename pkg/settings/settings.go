@@ -18,10 +18,10 @@ var (
 	Signup          = NewSetting(SignupEnabledSettingName, "true")
 	DefaultUserRole = NewSetting(DefaultUserRoleSettingName, "pending") // options are pending, user, admin
 	WebhookURL      = NewSetting(WebhookURLSettingName, "")
-	JWTSecret       = NewSetting(JWTSecretSettingName, "llmos")
-	TokenExpireTime = NewSetting(TokenExpireTimeSettingName, "3600s")  // default to 3600 seconds
+	JWTSecret       = NewSetting(JWTSecretSettingName, "llmos-dashboard-secret")
+	TokenExpireTime = NewSetting(TokenExpireTimeSettingName, "24h")    // supported units are "h", "m", "s"
 	AllowChatDelete = NewSetting(AllowChatDeletionSettingName, "true") // allow users to delete their own chat
-	ModelWhiteList  = NewSetting(ModelWhiteListSettingName, "")        // empty means allow all
+	ModelWhiteList  = NewSetting(ModelWhitelistSettingName, "")        // empty means allow all
 )
 
 const (
@@ -33,7 +33,7 @@ const (
 	JWTSecretSettingName         = "jwt-secret-name"
 	TokenExpireTimeSettingName   = "token-expire-time"
 	AllowChatDeletionSettingName = "allow-chat-deletion"
-	ModelWhiteListSettingName    = "model-white-list"
+	ModelWhitelistSettingName    = "model-whitelist"
 )
 
 func init() {

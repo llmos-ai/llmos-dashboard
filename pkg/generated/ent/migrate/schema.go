@@ -87,7 +87,7 @@ var (
 	SettingsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "name", Type: field.TypeString, Unique: true},
-		{Name: "default", Type: field.TypeString, Default: ""},
+		{Name: "default", Type: field.TypeString, Nullable: true},
 		{Name: "value", Type: field.TypeString, Nullable: true},
 		{Name: "is_active", Type: field.TypeBool, Default: true},
 		{Name: "read_only", Type: field.TypeBool, Default: false},

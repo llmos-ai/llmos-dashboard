@@ -9,6 +9,7 @@ import (
 	"github.com/llmos-ai/llmos-dashboard/pkg/api/auth"
 	"github.com/llmos-ai/llmos-dashboard/pkg/api/chat"
 	"github.com/llmos-ai/llmos-dashboard/pkg/api/modelfile"
+	"github.com/llmos-ai/llmos-dashboard/pkg/database"
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent"
 )
 
@@ -35,14 +36,17 @@ func RegisterWebApi(r *gin.Engine, client *ent.Client, ctx context.Context) erro
 		// User API
 		api.GET("/users/", auth.ListAllUser)
 		api.POST("/users/:id/update", auth.UpdateUser)
-		api.POST("/users/update/role", auth.UpdateUserRole)
+		api.POST("/users/update/role", auth.AdminMiddleware, auth.UpdateUserRole)
 
 		// Modefile API
-		api.GET("/modelfiles/", modelHandler.ListModelFile)
-		api.POST("/modelfiles/", modelHandler.GetModelFileByTagName)
-		api.POST("/modelfiles/create", modelHandler.CreateModelFile)
-		api.POST("/modelfiles/update", modelHandler.UpdateModelFile)
-		api.DELETE("/modelfiles/:tagName", modelHandler.DeleteModelFile)
+		api.GET("/modelfiles/", auth.AdminMiddleware, modelHandler.ListModelFile)
+		api.POST("/modelfiles/", auth.AdminMiddleware, modelHandler.GetModelFileByTagName)
+		api.POST("/modelfiles/create", auth.AdminMiddleware, modelHandler.CreateModelFile)
+		api.POST("/modelfiles/update", auth.AdminMiddleware, modelHandler.UpdateModelFile)
+		api.DELETE("/modelfiles/:tagName", auth.AdminMiddleware, modelHandler.DeleteModelFile)
+
+		// DB api
+		api.GET("/db/download/", auth.AdminMiddleware, downloadDBFile)
 	}
 	return nil
 }
@@ -57,4 +61,8 @@ func ListPrompts(c *gin.Context) {
 
 func ListChatTags(c *gin.Context) {
 	c.JSONP(http.StatusOK, []string{})
+}
+
+func downloadDBFile(c *gin.Context) {
+	c.FileAttachment(database.GetDBFileName(), "llmos-dashboard.db")
 }

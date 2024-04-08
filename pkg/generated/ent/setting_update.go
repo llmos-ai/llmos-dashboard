@@ -69,6 +69,12 @@ func (su *SettingUpdate) SetNillableDefault(s *string) *SettingUpdate {
 	return su
 }
 
+// ClearDefault clears the value of the "default" field.
+func (su *SettingUpdate) ClearDefault() *SettingUpdate {
+	su.mutation.ClearDefault()
+	return su
+}
+
 // SetValue sets the "value" field.
 func (su *SettingUpdate) SetValue(s string) *SettingUpdate {
 	su.mutation.SetValue(s)
@@ -156,11 +162,6 @@ func (su *SettingUpdate) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Setting.name": %w`, err)}
 		}
 	}
-	if v, ok := su.mutation.Default(); ok {
-		if err := setting.DefaultValidator(v); err != nil {
-			return &ValidationError{Name: "default", err: fmt.Errorf(`ent: validator failed for field "Setting.default": %w`, err)}
-		}
-	}
 	return nil
 }
 
@@ -181,6 +182,9 @@ func (su *SettingUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := su.mutation.Default(); ok {
 		_spec.SetField(setting.FieldDefault, field.TypeString, value)
+	}
+	if su.mutation.DefaultCleared() {
+		_spec.ClearField(setting.FieldDefault, field.TypeString)
 	}
 	if value, ok := su.mutation.Value(); ok {
 		_spec.SetField(setting.FieldValue, field.TypeString, value)
@@ -239,6 +243,12 @@ func (suo *SettingUpdateOne) SetNillableDefault(s *string) *SettingUpdateOne {
 	if s != nil {
 		suo.SetDefault(*s)
 	}
+	return suo
+}
+
+// ClearDefault clears the value of the "default" field.
+func (suo *SettingUpdateOne) ClearDefault() *SettingUpdateOne {
+	suo.mutation.ClearDefault()
 	return suo
 }
 
@@ -342,11 +352,6 @@ func (suo *SettingUpdateOne) check() error {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`ent: validator failed for field "Setting.name": %w`, err)}
 		}
 	}
-	if v, ok := suo.mutation.Default(); ok {
-		if err := setting.DefaultValidator(v); err != nil {
-			return &ValidationError{Name: "default", err: fmt.Errorf(`ent: validator failed for field "Setting.default": %w`, err)}
-		}
-	}
 	return nil
 }
 
@@ -384,6 +389,9 @@ func (suo *SettingUpdateOne) sqlSave(ctx context.Context) (_node *Setting, err e
 	}
 	if value, ok := suo.mutation.Default(); ok {
 		_spec.SetField(setting.FieldDefault, field.TypeString, value)
+	}
+	if suo.mutation.DefaultCleared() {
+		_spec.ClearField(setting.FieldDefault, field.TypeString)
 	}
 	if value, ok := suo.mutation.Value(); ok {
 		_spec.SetField(setting.FieldValue, field.TypeString, value)

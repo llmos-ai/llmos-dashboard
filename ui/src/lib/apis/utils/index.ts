@@ -28,7 +28,7 @@ export const getGravatarUrl = async (email: string) => {
 export const downloadDatabase = async (token: string) => {
   let error = null;
 
-  const res = await fetch(`${WEBUI_API_BASE_URL}/utils/db/download`, {
+  const res = await fetch(`${WEBUI_API_BASE_URL}/db/download`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",

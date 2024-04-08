@@ -8,12 +8,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
+	"github.com/llmos-ai/llmos-dashboard/pkg/constant"
 	entv1 "github.com/llmos-ai/llmos-dashboard/pkg/generated/ent"
 	entv1User "github.com/llmos-ai/llmos-dashboard/pkg/generated/ent/user"
 	"github.com/llmos-ai/llmos-dashboard/pkg/settings"
-	v1 "github.com/llmos-ai/llmos-dashboard/pkg/types/v1"
-
-	"github.com/llmos-ai/llmos-dashboard/pkg/constant"
 	"github.com/llmos-ai/llmos-dashboard/pkg/utils"
 )
 
@@ -59,7 +57,6 @@ func (h *Handler) SignIn(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
 	slog.Debug("login info", l.Email)
 
 	user, err := h.GetUserByEmail(l.Email)
@@ -101,7 +98,7 @@ func (h *Handler) SignUp(c *gin.Context) {
 		return
 	}
 
-	role := v1.GetUserRole(settings.DefaultUserRole.Get())
+	role := GetUserRole(settings.DefaultUserRole.Get())
 	// always set the first user as the admin user
 	users, err := h.GetAllUser()
 	if err != nil {
