@@ -2,7 +2,6 @@ package settings
 
 import (
 	"encoding/json"
-	"fmt"
 	"log/slog"
 	"strconv"
 	"strings"
@@ -88,7 +87,6 @@ func (s Setting) Set(value string) error {
 }
 
 func (s Setting) Get() string {
-	fmt.Println("get provider:", provider)
 	if provider == nil {
 		s := settings[s.Name]
 		return s.Default

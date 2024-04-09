@@ -3,6 +3,8 @@ package router
 import (
 	"context"
 
+	"github.com/gin-contrib/pprof"
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent"
@@ -24,15 +26,20 @@ var registeredRouters = []RegisterRouter{
 }
 
 func RegisterRouters(r *gin.Engine, c *ent.Client, ctx context.Context) error {
-
 	// enable CORS for all origins
 	r.Use(CORSMiddleware())
+	pprof.Register(r)
 
-	// Serve frontend static files
-	r.StaticFS("static", gin.Dir("static", true))
+	// serve static files
+	r.Use(static.Serve("/", static.LocalFile("ui/build", true)))
+	// fallback to index.html
+	r.NoRoute(func(c *gin.Context) {
+		c.File("./ui/build/index.html")
+	})
 
-	r.GET("api/config", GetAPIConfig)
-	r.GET("api/changelog", GetChangelog)
+	r.StaticFS("/static", gin.Dir("static", true))
+	r.GET("/api/config", GetAPIConfig)
+	r.GET("/api/changelog", GetChangelog)
 
 	for _, router := range registeredRouters {
 		err := router(r, c, ctx)
@@ -40,5 +47,6 @@ func RegisterRouters(r *gin.Engine, c *ent.Client, ctx context.Context) error {
 			return err
 		}
 	}
+
 	return nil
 }

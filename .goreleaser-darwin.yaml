@@ -1,0 +1,129 @@
+version: 1
+
+env:
+  - LLMOS_UI_REPO={{ if index .Env "LLMOS_UI_REPO"  }}{{ .Env.LLMOS_UI_REPO }}{{ else }}docker.io/llmosai/llmos-dashboard{{ end }}
+  - BUILDER={{ if index .Env "BUILDER"  }}{{ .Env.BUILDER }}{{ else }}default{{ end }}
+  - VERSION={{ if index .Env "VERSION"  }}{{ .Env.VERSION }}{{ else }} main {{ end }}
+
+before:
+  hooks:
+  - go mod tidy
+  - go generate
+
+snapshot:
+  # https://goreleaser.com/customization/snapshots/
+  name_template: '{{ trimprefix .Summary "v" }}'
+
+checksum:
+  # https://goreleaser.com/customization/checksum/
+  name_template: 'checksums.txt'
+
+builds:
+  - id: "linux-amd64"
+    binary: llmos-dashboard
+    goos:
+    - linux
+    goarch:
+    - amd64
+    tags:
+    - netgo
+    env:
+    - CC=x86_64-linux-musl-gcc
+    - CXX=x86_64-linux-musl-g++
+    - CGO_ENABLED=1
+    ldflags:
+    - -s
+    - -w
+    - -X "github.com/llmos-ai/llmos-dashboard/version/version.Version={{ .Env.VERSION }}"
+  - id: "linux-arm64"
+    binary: llmos-dashboard
+    goos:
+    - linux
+    goarch:
+    - arm64
+    tags:
+    - netgo
+    env:
+    - CC=aarch64-linux-musl-gcc
+    - CXX=aarch64-linux-musl-g++
+    - CGO_ENABLED=1
+    ldflags:
+    - -s
+    - -w
+    - -X "github.com/llmos-ai/llmos-dashboard/version/version.Version={{ .Env.VERSION }}"
+  - id: "darwin-build"
+    binary: llmos-dashboard
+    env:
+      - CGO_ENABLED=1
+    goos:
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    tags:
+      - netgo
+    ldflags:
+      - -s
+      - -w
+      - -X "github.com/llmos-ai/llmos-dashboard/version/version.Version={{ .Env.VERSION }}"
+
+changelog:
+  use: github
+  sort: asc
+  filters:
+    exclude:
+    - "^docs:"
+    - "^test:"
+
+dockers:
+  - use: buildx
+    goos: linux
+    goarch: amd64
+    dockerfile: package/Dockerfile
+    image_templates:
+      - "{{ .Env.LLMOS_UI_REPO }}:{{ .Env.VERSION }}-amd64"
+    build_flag_templates:
+      - "--builder={{ .Env.BUILDER }}"
+      - "--pull"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Env.VERSION}}"
+      - "--label=org.opencontainers.image.source=https://github.com/llmos-ai/llmos-dashboard"
+      - "--platform=linux/amd64"
+    extra_files:
+    - ui/build
+    - package/entrypoint.sh
+    - static
+
+  - use: buildx
+    goos: linux
+    goarch: arm64
+    dockerfile: package/Dockerfile
+    image_templates:
+      - "{{ .Env.LLMOS_UI_REPO }}:{{ .Env.VERSION }}-arm64"
+    build_flag_templates:
+      - "--builder={{ .Env.BUILDER }}"
+      - "--pull"
+      - "--label=org.opencontainers.image.created={{.Date}}"
+      - "--label=org.opencontainers.image.title={{.ProjectName}}"
+      - "--label=org.opencontainers.image.revision={{.FullCommit}}"
+      - "--label=org.opencontainers.image.version={{.Env.VERSION}}"
+      - "--label=org.opencontainers.image.source=https://github.com/llmos-ai/llmos-dashboard"
+      - "--platform=linux/arm64"
+    extra_files:
+    - ui/build
+    - package/entrypoint.sh
+    - static
+
+docker_manifests:
+  - use: docker
+    name_template: "{{ .Env.LLMOS_UI_REPO }}:{{ .Env.VERSION }}"
+    image_templates:
+      - "{{ .Env.LLMOS_UI_REPO }}:{{ .Env.VERSION }}-amd64"
+      - "{{ .Env.LLMOS_UI_REPO }}:{{ .Env.VERSION }}-arm64"
+
+docker_signs:
+  - artifacts: all
+    stdin: "{{ .Env.COSIGN_PASSWORD }}"
+

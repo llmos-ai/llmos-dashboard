@@ -45,7 +45,7 @@ export const downloadDatabase = async (token: string) => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "webui.auth";
+      a.download = "llmos-dashboard.db";
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);

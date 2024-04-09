@@ -39,7 +39,7 @@ func RegisterWebApi(r *gin.Engine, client *ent.Client, ctx context.Context) erro
 		api.POST("/users/update/role", auth.AdminMiddleware, auth.UpdateUserRole)
 
 		// Modefile API
-		api.GET("/modelfiles/", auth.AdminMiddleware, modelHandler.ListModelFile)
+		api.GET("/modelfiles/", modelHandler.ListModelFile)
 		api.POST("/modelfiles/", auth.AdminMiddleware, modelHandler.GetModelFileByTagName)
 		api.POST("/modelfiles/create", auth.AdminMiddleware, modelHandler.CreateModelFile)
 		api.POST("/modelfiles/update", auth.AdminMiddleware, modelHandler.UpdateModelFile)
@@ -64,5 +64,5 @@ func ListChatTags(c *gin.Context) {
 }
 
 func downloadDBFile(c *gin.Context) {
-	c.FileAttachment(database.GetDBFileName(), "llmos-dashboard.db")
+	c.File(database.GetDBFileName())
 }

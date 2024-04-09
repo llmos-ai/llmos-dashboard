@@ -24,5 +24,5 @@ func RegisterDBClient(ctx context.Context) (*ent.Client, error) {
 }
 
 func GetDBFileName() string {
-	return fmt.Sprintf("./%s", dbFileName)
+	return dbFileName
 }
