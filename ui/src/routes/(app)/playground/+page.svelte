@@ -81,10 +81,7 @@
           },
         ],
       },
-      model.external
-        ? model.source === "ollama"
-          ? `${OLLAMA_API_BASE_URL}/v1`
-          : `${OPENAI_API_BASE_URL}`
+      model.external ? `${OPENAI_API_BASE_URL}` : `${OLLAMA_API_BASE_URL}/v1`
     );
 
     if (res && res.ok) {
@@ -151,10 +148,7 @@
           ...messages,
         ].filter((message) => message),
       },
-      model.external
-        ? model.source === "ollama"
-          ? `${OLLAMA_API_BASE_URL}/v1`
-          : `${OPENAI_API_BASE_URL}`
+      model.external ? `${OPENAI_API_BASE_URL}` : `${OLLAMA_API_BASE_URL}/v1`
     );
 
     let responseMessage;
