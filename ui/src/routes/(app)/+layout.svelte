@@ -7,7 +7,7 @@
 
   import { goto } from "$app/navigation";
 
-  import { getOllamaModels, getOllamaVersion } from "$lib/apis/ollama";
+  import { getOllamaModels, getOllamaVersion } from "$lib/apis/localllm";
   import { getModelfiles } from "$lib/apis/modelfiles";
   import { getPrompts } from "$lib/apis/prompts";
   import { getOpenAIModels } from "$lib/apis/openai";

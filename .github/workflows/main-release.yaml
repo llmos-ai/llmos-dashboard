@@ -46,9 +46,9 @@ jobs:
         version: latest
         args: release --clean --snapshot
       env:
-        # GitHub sets this automatically
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub sets this automatically
         VERSION: ${{ github.ref_name }}
+        IMG_REPO: ${{ vars.IMG_REPO || 'ghcr.io/llmos-ai' }}
     - name: Push Latest(main) Docker Images
       run: |
         IMAGES=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep llmos-dashboard:"$VERSION")

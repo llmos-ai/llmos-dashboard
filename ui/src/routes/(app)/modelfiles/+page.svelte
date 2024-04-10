@@ -6,7 +6,7 @@
   import { onMount, getContext } from "svelte";
 
   import { WEBUI_NAME, modelfiles, settings, user } from "$lib/stores";
-  import { createModel, deleteModel } from "$lib/apis/ollama";
+  import { createModel, deleteModel } from "$lib/apis/localllm";
   import {
     createNewModelfile,
     deleteModelfileByUID,

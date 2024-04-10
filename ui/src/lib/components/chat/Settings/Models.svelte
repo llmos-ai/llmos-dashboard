@@ -6,12 +6,12 @@
     createModel,
     deleteModel,
     downloadModel,
-    getOllamaUrls,
+    getLocalLLMUrl,
     getOllamaVersion,
     pullModel,
     cancelOllamaRequest,
     uploadModel,
-  } from "$lib/apis/ollama";
+  } from "$lib/apis/localllm";
   import { WEBUI_API_BASE_URL, WEBUI_BASE_URL } from "$lib/constants";
   import { WEBUI_NAME, models, user } from "$lib/stores";
   import { splitStream } from "$lib/utils";
@@ -26,6 +26,7 @@
 
   // Models
   let OLLAMA_URLS = [];
+  let LocalLLM_URL = "";
   let selectedOllamaUrlIdx: string | null = null;
 
   let updateModelId = null;
@@ -446,14 +447,10 @@
   };
 
   onMount(async () => {
-    OLLAMA_URLS = await getOllamaUrls(localStorage.token).catch((error) => {
+    LocalLLM_URL = await getLocalLLMUrl(localStorage.token).catch((error) => {
       toast.error(error);
       return [];
     });
-
-    if (OLLAMA_URLS.length > 0) {
-      selectedOllamaUrlIdx = 0;
-    }
 
     ollamaVersion = await getOllamaVersion(localStorage.token).catch(
       (error) => false
@@ -487,11 +484,9 @@
                 bind:value={selectedOllamaUrlIdx}
                 placeholder={$i18n.t("Select an Ollama instance")}
               >
-                {#each OLLAMA_URLS as url, idx}
-                  <option value={idx} class="bg-gray-100 dark:bg-gray-700"
-                    >{url}</option
-                  >
-                {/each}
+                <option value={LocalLLM_URL} class="bg-gray-100 dark:bg-gray-700"
+                >{LocalLLM_URL}</option
+                >
               </select>
             </div>
 

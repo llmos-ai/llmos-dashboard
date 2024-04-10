@@ -1,9 +1,10 @@
-import { OLLAMA_API_BASE_URL } from "$lib/constants";
+import { LOCAL_LLM_API_BASE_URL } from "$lib/constants";
 
-export const getOllamaUrls = async (token: string = "") => {
+let OLLAMA_API_BASE_URL = `${LOCAL_LLM_API_BASE_URL}/ollama`
+export const getLocalLLMUrl = async (token: string = "") => {
   let error = null;
 
-  const res = await fetch(`${OLLAMA_API_BASE_URL}/urls`, {
+  const res = await fetch(`${LOCAL_LLM_API_BASE_URL}/url`, {
     method: "GET",
     headers: {
       Accept: "application/json",
@@ -29,13 +30,13 @@ export const getOllamaUrls = async (token: string = "") => {
     throw error;
   }
 
-  return res.OLLAMA_BASE_URLS;
+  return res.url;
 };
 
-export const updateOllamaUrls = async (token: string = "", urls: string[]) => {
+export const updateLocalLLMUrl = async (token: string = "", url: string) => {
   let error = null;
 
-  const res = await fetch(`${OLLAMA_API_BASE_URL}/urls/update`, {
+  const res = await fetch(`${LOCAL_LLM_API_BASE_URL}/url/update`, {
     method: "POST",
     headers: {
       Accept: "application/json",
@@ -43,7 +44,7 @@ export const updateOllamaUrls = async (token: string = "", urls: string[]) => {
       ...(token && { authorization: `Bearer ${token}` }),
     },
     body: JSON.stringify({
-      urls: urls,
+      url: url,
     }),
   })
     .then(async (res) => {
@@ -64,7 +65,7 @@ export const updateOllamaUrls = async (token: string = "", urls: string[]) => {
     throw error;
   }
 
-  return res.OLLAMA_BASE_URLS;
+  return res.url;
 };
 
 export const getOllamaVersion = async (token: string = "") => {
@@ -497,16 +498,3 @@ export const uploadModel = async (
   }
   return res;
 };
-
-// export const pullModel = async (token: string, tagName: string) => {
-// 	return await fetch(`${OLLAMA_API_BASE_URL}/pull`, {
-// 		method: 'POST',
-// 		headers: {
-// 			'Content-Type': 'text/event-stream',
-// 			Authorization: `Bearer ${token}`
-// 		},
-// 		body: JSON.stringify({
-// 			name: tagName
-// 		})
-// 	});
-// };

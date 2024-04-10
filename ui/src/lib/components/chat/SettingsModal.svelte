@@ -3,7 +3,7 @@
   import { toast } from "svelte-sonner";
   import { models, settings, user } from "$lib/stores";
 
-  import { getOllamaModels } from "$lib/apis/ollama";
+  import { getOllamaModels } from "$lib/apis/localllm";
   import { getOpenAIModels } from "$lib/apis/openai";
 
   import Modal from "../common/Modal.svelte";

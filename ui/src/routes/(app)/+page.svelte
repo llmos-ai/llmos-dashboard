@@ -23,7 +23,7 @@
     generateChatCompletion,
     cancelOllamaRequest,
     generateTitle,
-  } from "$lib/apis/ollama";
+  } from "$lib/apis/localllm";
   import {
     addTagById,
     createNewChat,
@@ -433,7 +433,7 @@
                   if (responseMessage.content == "") {
                     responseMessage.error = true;
                     responseMessage.content =
-                      "Oops! No text generated from Ollama, Please try again.";
+                      "Oops! No text generated from LLM, Please try again.";
                   }
 
                   responseMessage.context = data.context ?? null;

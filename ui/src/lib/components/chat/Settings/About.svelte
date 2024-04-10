@@ -1,6 +1,6 @@
 <script lang="ts">
   import { getVersionUpdates } from "$lib/apis";
-  import { getOllamaVersion } from "$lib/apis/ollama";
+  import { getOllamaVersion } from "$lib/apis/localllm";
   import { WEBUI_VERSION } from "$lib/constants";
   import { WEBUI_NAME, config, showChangelog } from "$lib/stores";
   import { compareVersion } from "$lib/utils";
@@ -107,24 +107,17 @@
     <hr class=" dark:border-gray-700" />
 
     <div class="flex space-x-1">
-      <a href="https://discord.gg/5rJgQTnV4s" target="_blank">
+      <a href="https://github.com/orgs/llmos-ai/discussions" target="_blank">
         <img
-          alt="Discord"
-          src="https://img.shields.io/badge/Discord-Open_WebUI-blue?logo=discord&logoColor=white"
+          alt="Discussion Forum"
+          src="https://img.shields.io/github/discussions/llmos-ai/llmos-dashboard"
         />
       </a>
 
-      <a href="https://twitter.com/OpenWebUI" target="_blank">
-        <img
-          alt="X (formerly Twitter) Follow"
-          src="https://img.shields.io/twitter/follow/OpenWebUI"
-        />
-      </a>
-
-      <a href="https://github.com/open-webui/open-webui" target="_blank">
+      <a href="https://github.com/llmos-ai/llmos-dashboard" target="_blank">
         <img
           alt="Github Repo"
-          src="https://img.shields.io/github/stars/open-webui/open-webui?style=social&label=Star us on Github"
+          src="https://img.shields.io/github/stars/llmos-ai/llmos-dashboard?style=social&label=Star us on Github"
         />
       </a>
     </div>
@@ -133,8 +126,8 @@
       {$i18n.t("Created by")}
       <a
         class=" text-gray-500 dark:text-gray-300 font-medium"
-        href="https://github.com/tjbck"
-        target="_blank">Timothy J. Baek</a
+        href="https://1block.ai"
+        target="_blank">1block.ai (UI is based on Open WebUI)</a
       >
     </div>
   </div>

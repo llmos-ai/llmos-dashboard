@@ -212,7 +212,7 @@
   "Not sure what to write? Switch to": "不确定写什么？切换到",
   "Off": "关闭",
   "Okay, Let's Go!": "好的，我们开始吧！",
-  "Ollama Base URL": "Ollama 基础 URL",
+  "Local LLM Base URL": "本地大模型(LLM) URL",
   "Ollama Version": "Ollama 版本",
   "On": "开",
   "Only": "仅",

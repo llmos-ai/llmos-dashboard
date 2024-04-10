@@ -1,7 +1,7 @@
 version: 1
 
 env:
-  - LLMOS_UI_REPO={{ if index .Env "LLMOS_UI_REPO"  }}{{ .Env.LLMOS_UI_REPO }}{{ else }}docker.io/llmosai/llmos-dashboard{{ end }}
+  - IMG_REPO={{ if index .Env "IMG_REPO"  }}{{ .Env.IMG_REPO }}{{ else }}ghcr.io/llmos-ai{{ end }}
   - BUILDER={{ if index .Env "BUILDER"  }}{{ .Env.BUILDER }}{{ else }}default{{ end }}
   - VERSION={{ if index .Env "VERSION"  }}{{ .Env.VERSION }}{{ else }} main {{ end }}
 
@@ -81,7 +81,7 @@ dockers:
     goarch: amd64
     dockerfile: package/Dockerfile
     image_templates:
-      - "{{ .Env.LLMOS_UI_REPO }}:{{ .Env.VERSION }}-amd64"
+      - "{{ .Env.IMG_REPO }}/llmos-dashboard:{{ .Env.VERSION }}-amd64"
     build_flag_templates:
       - "--builder={{ .Env.BUILDER }}"
       - "--pull"
@@ -101,7 +101,7 @@ dockers:
     goarch: arm64
     dockerfile: package/Dockerfile
     image_templates:
-      - "{{ .Env.LLMOS_UI_REPO }}:{{ .Env.VERSION }}-arm64"
+      - "{{ .Env.IMG_REPO }}/llmos-dashboard:{{ .Env.VERSION }}-arm64"
     build_flag_templates:
       - "--builder={{ .Env.BUILDER }}"
       - "--pull"
@@ -118,10 +118,10 @@ dockers:
 
 docker_manifests:
   - use: docker
-    name_template: "{{ .Env.LLMOS_UI_REPO }}:{{ .Env.VERSION }}"
+    name_template: "{{ .Env.IMG_REPO }}/llmos-dashboard:{{ .Env.VERSION }}"
     image_templates:
-      - "{{ .Env.LLMOS_UI_REPO }}:{{ .Env.VERSION }}-amd64"
-      - "{{ .Env.LLMOS_UI_REPO }}:{{ .Env.VERSION }}-arm64"
+      - "{{ .Env.IMG_REPO }}/llmos-dashboard:{{ .Env.VERSION }}-amd64"
+      - "{{ .Env.IMG_REPO }}/llmos-dashboard:{{ .Env.VERSION }}-arm64"
 
 docker_signs:
   - artifacts: all

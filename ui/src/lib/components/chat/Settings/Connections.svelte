@@ -4,10 +4,10 @@
   const dispatch = createEventDispatcher();
 
   import {
-    getOllamaUrls,
+    getLocalLLMUrl,
     getOllamaVersion,
-    updateOllamaUrls,
-  } from "$lib/apis/ollama";
+    updateLocalLLMUrl,
+  } from "$lib/apis/localllm";
   import {
     getOpenAIKeys,
     getOpenAIUrls,
@@ -22,7 +22,7 @@
 
   // External
   let OLLAMA_BASE_URL = "";
-  let OLLAMA_BASE_URLS = [""];
+  let LocalLLM_URL = "";
 
   let OPENAI_API_KEY = "";
   let OPENAI_API_BASE_URL = "";
@@ -46,10 +46,7 @@
   };
 
   const updateOllamaUrlsHandler = async () => {
-    OLLAMA_BASE_URLS = await updateOllamaUrls(
-      localStorage.token,
-      OLLAMA_BASE_URLS
-    );
+    LocalLLM_URL = await updateLocalLLMUrl(localStorage.token, LocalLLM_URL);
 
     const ollamaVersion = await getOllamaVersion(localStorage.token).catch(
       (error) => {
@@ -66,7 +63,7 @@
 
   onMount(async () => {
     if ($user.role === "admin") {
-      OLLAMA_BASE_URLS = await getOllamaUrls(localStorage.token);
+      LocalLLM_URL = await getLocalLLMUrl(localStorage.token);
       OPENAI_API_BASE_URLS = await getOpenAIUrls(localStorage.token);
       OPENAI_API_KEYS = await getOpenAIKeys(localStorage.token);
     }
@@ -177,63 +174,15 @@
 
     <div>
       <div class=" mb-2.5 text-sm font-medium">
-        {$i18n.t("Ollama Base URL")}
+        {$i18n.t("Local LLM Base URL")}
       </div>
       <div class="flex w-full gap-1.5">
         <div class="flex-1 flex flex-col gap-2">
-          {#each OLLAMA_BASE_URLS as url, idx}
-            <div class="flex gap-1.5">
-              <input
-                class="w-full rounded-lg py-2 px-4 text-sm dark:text-gray-300 dark:bg-gray-850 outline-none"
-                placeholder="Enter URL (e.g. http://localhost:11434)"
-                bind:value={url}
-              />
-
-              <div class="self-center flex items-center">
-                {#if idx === 0}
-                  <button
-                    class="px-1"
-                    on:click={() => {
-                      OLLAMA_BASE_URLS = [...OLLAMA_BASE_URLS, ""];
-                    }}
-                    type="button"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 16 16"
-                      fill="currentColor"
-                      class="w-4 h-4"
-                    >
-                      <path
-                        d="M8.75 3.75a.75.75 0 0 0-1.5 0v3.5h-3.5a.75.75 0 0 0 0 1.5h3.5v3.5a.75.75 0 0 0 1.5 0v-3.5h3.5a.75.75 0 0 0 0-1.5h-3.5v-3.5Z"
-                      />
-                    </svg>
-                  </button>
-                {:else}
-                  <button
-                    class="px-1"
-                    on:click={() => {
-                      OLLAMA_BASE_URLS = OLLAMA_BASE_URLS.filter(
-                        (url, urlIdx) => idx !== urlIdx
-                      );
-                    }}
-                    type="button"
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 16 16"
-                      fill="currentColor"
-                      class="w-4 h-4"
-                    >
-                      <path
-                        d="M3.75 7.25a.75.75 0 0 0 0 1.5h8.5a.75.75 0 0 0 0-1.5h-8.5Z"
-                      />
-                    </svg>
-                  </button>
-                {/if}
-              </div>
-            </div>
-          {/each}
+          <input
+                  class="w-full rounded-lg py-2 px-4 text-sm dark:text-gray-300 dark:bg-gray-850 outline-none"
+                  placeholder="Enter URL (e.g. http://localhost:11434)"
+                  bind:value={LocalLLM_URL}
+          />
         </div>
 
         <div class="">
