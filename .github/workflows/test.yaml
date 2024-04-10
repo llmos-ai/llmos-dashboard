@@ -8,6 +8,8 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
+    - name: Install gcc
+      run: sudo apt install gcc-aarch64-linux-gnu
     - name: Checkout
       uses: actions/checkout@v4
     - name: Set up Go

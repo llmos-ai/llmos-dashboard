@@ -6,7 +6,7 @@
   import { toast } from "svelte-sonner";
 
   import {
-    OLLAMA_API_BASE_URL,
+    LOCAL_LLM_API_BASE_URL,
     OPENAI_API_BASE_URL,
     WEBUI_API_BASE_URL,
   } from "$lib/constants";
@@ -15,7 +15,7 @@
   import {
     cancelOllamaRequest,
     generateChatCompletion,
-  } from "$lib/apis/ollama";
+  } from "$lib/apis/localllm";
   import { generateOpenAIChatCompletion } from "$lib/apis/openai";
 
   import { splitStream } from "$lib/utils";
@@ -81,7 +81,7 @@
           },
         ],
       },
-      model.external ? `${OPENAI_API_BASE_URL}` : `${OLLAMA_API_BASE_URL}/v1`
+      model.external ? `${OPENAI_API_BASE_URL}` : `${LOCAL_LLM_API_BASE_URL}/v1`
     );
 
     if (res && res.ok) {
@@ -148,7 +148,7 @@
           ...messages,
         ].filter((message) => message),
       },
-      model.external ? `${OPENAI_API_BASE_URL}` : `${OLLAMA_API_BASE_URL}/v1`
+      model.external ? `${OPENAI_API_BASE_URL}` : `${LOCAL_LLM_API_BASE_URL}/v1`
     );
 
     let responseMessage;

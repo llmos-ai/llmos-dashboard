@@ -9,7 +9,7 @@
   import { settings, user, config, modelfiles } from "$lib/stores";
   import { splitStream } from "$lib/utils";
 
-  import { createModel } from "$lib/apis/ollama";
+  import { createModel } from "$lib/apis/localllm";
   import {
     getModelfiles,
     updateModelfileByUID,

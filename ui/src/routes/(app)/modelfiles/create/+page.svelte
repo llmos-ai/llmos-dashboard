@@ -7,7 +7,7 @@
   import AdvancedParams from "$lib/components/chat/Settings/Advanced/AdvancedParams.svelte";
   import { splitStream } from "$lib/utils";
   import { onMount, tick, getContext } from "svelte";
-  import { createModel } from "$lib/apis/ollama";
+  import { createModel } from "$lib/apis/localllm";
   import {
     createNewModelfile,
     getModelfileByTagName,

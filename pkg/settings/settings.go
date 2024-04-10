@@ -12,15 +12,16 @@ var (
 	provider       Provider
 	InjectDefaults string
 
-	FirstLogin      = NewSetting(FirstLoginSettingName, "true")
-	UIPl            = NewSetting(UIPlSettingName, "LLMOS Dashboard")
-	Signup          = NewSetting(SignupEnabledSettingName, "true")
-	DefaultUserRole = NewSetting(DefaultUserRoleSettingName, "pending") // options are pending, user, admin
-	WebhookURL      = NewSetting(WebhookURLSettingName, "")
-	JWTSecret       = NewSetting(JWTSecretSettingName, "llmos-dashboard-secret")
-	TokenExpireTime = NewSetting(TokenExpireTimeSettingName, "24h")    // supported units are "h", "m", "s"
-	AllowChatDelete = NewSetting(AllowChatDeletionSettingName, "true") // allow users to delete their own chat
-	ModelWhiteList  = NewSetting(ModelWhitelistSettingName, "")        // empty means allow all
+	FirstLogin        = NewSetting(FirstLoginSettingName, "true")
+	UIPl              = NewSetting(UIPlSettingName, "LLMOS Dashboard")
+	Signup            = NewSetting(SignupEnabledSettingName, "true")
+	DefaultUserRole   = NewSetting(DefaultUserRoleSettingName, "pending") // options are pending, user, admin
+	WebhookURL        = NewSetting(WebhookURLSettingName, "")
+	JWTSecret         = NewSetting(JWTSecretSettingName, "llmos-dashboard-secret")
+	TokenExpireTime   = NewSetting(TokenExpireTimeSettingName, "24h")    // supported units are "h", "m", "s"
+	AllowChatDelete   = NewSetting(AllowChatDeletionSettingName, "true") // allow users to delete their own chat
+	ModelWhiteList    = NewSetting(ModelWhitelistSettingName, "")        // empty means allow all
+	LocalLLMServerURL = NewSetting(LocalLLMServerURLSettingName, "http://localhost:11434")
 )
 
 const (
@@ -33,6 +34,7 @@ const (
 	TokenExpireTimeSettingName   = "token-expire-time"
 	AllowChatDeletionSettingName = "allow-chat-deletion"
 	ModelWhitelistSettingName    = "model-whitelist"
+	LocalLLMServerURLSettingName = "local-llm-server-url"
 )
 
 func init() {

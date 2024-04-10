@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { generatePrompt } from "$lib/apis/ollama";
+  import { generatePrompt } from "$lib/apis/localllm";
   import { models } from "$lib/stores";
   import { splitStream } from "$lib/utils";
   import { tick, getContext } from "svelte";

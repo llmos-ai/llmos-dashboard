@@ -9,7 +9,7 @@ import (
 
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent"
 	"github.com/llmos-ai/llmos-dashboard/pkg/router/auth"
-	"github.com/llmos-ai/llmos-dashboard/pkg/router/ollama"
+	"github.com/llmos-ai/llmos-dashboard/pkg/router/localllm"
 	"github.com/llmos-ai/llmos-dashboard/pkg/router/openai"
 	"github.com/llmos-ai/llmos-dashboard/pkg/router/setting"
 	"github.com/llmos-ai/llmos-dashboard/pkg/router/webapi"
@@ -21,7 +21,7 @@ var registeredRouters = []RegisterRouter{
 	auth.RegisterAuthRoute,
 	openai.RegisterLiteLLM,
 	webapi.RegisterWebApi,
-	ollama.RegisterOllama,
+	localllm.Register,
 	setting.Register,
 }
 
@@ -32,10 +32,6 @@ func RegisterRouters(r *gin.Engine, c *ent.Client, ctx context.Context) error {
 
 	// serve static files
 	r.Use(static.Serve("/", static.LocalFile("ui/build", true)))
-	// fallback to index.html
-	r.NoRoute(func(c *gin.Context) {
-		c.File("./ui/build/index.html")
-	})
 
 	r.StaticFS("/static", gin.Dir("static", true))
 	r.GET("/api/config", GetAPIConfig)
