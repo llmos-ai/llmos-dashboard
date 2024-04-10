@@ -28,6 +28,8 @@ builds:
     tags:
     - netgo
     env:
+    - CC=x86_64-linux-gnu-gcc
+    - CXX=x86_64-linux-gnu-g++
     - CGO_ENABLED=1
     ldflags:
     - -s
