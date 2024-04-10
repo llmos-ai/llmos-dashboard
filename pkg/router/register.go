@@ -2,6 +2,8 @@ package router
 
 import (
 	"context"
+	"net/http"
+	"strings"
 
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-contrib/static"
@@ -32,6 +34,8 @@ func RegisterRouters(r *gin.Engine, c *ent.Client, ctx context.Context) error {
 
 	// serve static files
 	r.Use(static.Serve("/", static.LocalFile("ui/build", true)))
+	// fallback to index.html
+	r.NoRoute(defaultNoRouter)
 
 	r.StaticFS("/static", gin.Dir("static", true))
 	r.GET("/api/config", GetAPIConfig)
@@ -45,4 +49,12 @@ func RegisterRouters(r *gin.Engine, c *ent.Client, ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func defaultNoRouter(c *gin.Context) {
+	if !strings.HasPrefix(c.Request.URL.Path, "/api") {
+		c.File("./ui/build/index.html")
+		return
+	}
+	c.JSON(http.StatusNotFound, gin.H{"error": "API not found"})
 }

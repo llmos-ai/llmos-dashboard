@@ -6,11 +6,11 @@ export const WEBUI_BASE_URL = dev ? `http://${location.hostname}:8080` : ``;
 
 export const WEBUI_API_BASE_URL = `${WEBUI_BASE_URL}/api/v1`;
 
-export const LOCAL_LLM_API_BASE_URL = `${WEBUI_BASE_URL}/localllm`;
-export const OPENAI_API_BASE_URL = `${WEBUI_BASE_URL}/openai/api`;
-export const AUDIO_API_BASE_URL = `${WEBUI_BASE_URL}/audio/api/v1`;
-export const IMAGES_API_BASE_URL = `${WEBUI_BASE_URL}/images/api/v1`;
-export const RAG_API_BASE_URL = `${WEBUI_BASE_URL}/rag/api/v1`;
+export const LOCAL_LLM_API_BASE_URL = `${WEBUI_BASE_URL}/api/localllm`;
+export const OPENAI_API_BASE_URL = `${WEBUI_BASE_URL}/api/openai/api`;
+export const AUDIO_API_BASE_URL = `${WEBUI_BASE_URL}/api/audio/api/v1`;
+export const IMAGES_API_BASE_URL = `${WEBUI_BASE_URL}/api/images/api/v1`;
+export const RAG_API_BASE_URL = `${WEBUI_BASE_URL}/api/rag/api/v1`;
 
 export const WEBUI_VERSION = APP_VERSION;
 export const REQUIRED_OLLAMA_VERSION = "0.1.16";

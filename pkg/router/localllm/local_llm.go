@@ -15,9 +15,11 @@ import (
 	"github.com/llmos-ai/llmos-dashboard/pkg/settings"
 )
 
+const apiPrefix = "/api/localllm"
+
 func Register(r *gin.Engine, client *ent.Client, ctx context.Context) error {
 	auth := auth.NewAuthHandler(client, ctx)
-	api := r.Group("/localllm")
+	api := r.Group(apiPrefix)
 	api.Use(auth.AuthMiddleware)
 	h := localllm.NewHandler(client, ctx)
 	{
@@ -60,5 +62,5 @@ func ReverseProxy(c *gin.Context) {
 }
 
 func trimOllamaPrefix(path string) string {
-	return strings.TrimPrefix(path, "/localllm/ollama")
+	return strings.TrimPrefix(path, apiPrefix+"/ollama")
 }

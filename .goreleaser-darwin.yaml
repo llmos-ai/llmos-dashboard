@@ -3,7 +3,7 @@ version: 1
 env:
   - IMG_REPO={{ if index .Env "IMG_REPO"  }}{{ .Env.IMG_REPO }}{{ else }}ghcr.io/llmos-ai{{ end }}
   - BUILDER={{ if index .Env "BUILDER"  }}{{ .Env.BUILDER }}{{ else }}default{{ end }}
-  - VERSION={{ if index .Env "VERSION"  }}{{ .Env.VERSION }}{{ else }} main {{ end }}
+  - VERSION={{ if index .Env "VERSION"  }}{{ .Env.VERSION }}{{ else }}{{ .Env.GITHUB_REF_NAME }}{{ end }}
 
 before:
   hooks:

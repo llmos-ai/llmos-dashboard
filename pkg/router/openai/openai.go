@@ -11,7 +11,7 @@ import (
 
 func RegisterLiteLLM(r *gin.Engine, client *ent.Client, ctx context.Context) error {
 	auth := auth.NewAuthHandler(client, ctx)
-	api := r.Group("/openai")
+	api := r.Group("/api/openai")
 	api.Use(auth.AuthMiddleware)
 	{
 		api.GET("/api/models", getModelFiles)
