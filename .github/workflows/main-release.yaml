@@ -13,6 +13,9 @@ permissions:
   contents: write
   packages: write
 
+env:
+  REGISTRY: ${{ vars.REGISTRY || 'ghcr.io/llmos-ai' }}
+  VERSION: ${{ github.ref_name }}
 jobs:
   main-release:
     runs-on: ubuntu-latest
@@ -47,19 +50,14 @@ jobs:
         args: release --clean --snapshot
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # GitHub sets this automatically
-        VERSION: ${{ github.ref_name }}
-        IMG_REPO: ${{ vars.IMG_REPO || 'ghcr.io/llmos-ai' }}
     - name: Push Latest(main) Docker Images
       run: |
-        IMAGES=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep llmos-dashboard:"$VERSION")
+        IMAGES=$(docker images --format "{{.Repository}}:{{.Tag}}" | grep llmos-dashboard:${{ env.VERSION }})
         for i in ${IMAGES}; do
           docker push $i
         done
-        docker manifest create ${{ env.IMG_REPO }}/llmos-dashboard:main ${IMAGES}
-        docker manifest push ${{ env.IMG_REPO }}/llmos-dashboard:main
-      env:
-        IMG_REPO: ${{ vars.IMG_REPO || 'ghcr.io/llmos-ai' }}
-        VERSION: ${{ github.ref_name }}
+        docker manifest create ${{ env.REGISTRY }}/llmos-dashboard:${{ env.VERSION }} ${IMAGES}
+        docker manifest push ${{ env.REGISTRY }}/llmos-dashboard:${{ env.VERSION }}
     - name: Failure Slack Notification
       if: failure()
       id: slack-failure

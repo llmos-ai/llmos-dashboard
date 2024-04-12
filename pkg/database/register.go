@@ -9,7 +9,7 @@ import (
 	"github.com/llmos-ai/llmos-dashboard/pkg/generated/ent"
 )
 
-const dbFileName = "llmos-dashboard.db"
+const dbFileName = "data/llmos-dashboard.db"
 
 func RegisterDBClient(ctx context.Context) (*ent.Client, error) {
 	client, err := ent.Open("sqlite3", fmt.Sprintf("file:%s?_fk=1", dbFileName))
