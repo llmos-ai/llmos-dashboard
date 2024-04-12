@@ -16,7 +16,10 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-const issuer = "llmos-issuer"
+const (
+	issuer   = "llmos-issuer"
+	hashCost = 10
+)
 
 func GenerateToken(uuid uuid.UUID) (string, error) {
 	duration, err := time.ParseDuration(settings.TokenExpireTime.Get())
@@ -60,7 +63,7 @@ func VerifyToken(tokenStr string) (*Claims, error) {
 }
 
 func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), hashCost)
 	return string(bytes), err
 }
 

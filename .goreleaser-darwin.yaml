@@ -1,7 +1,7 @@
 version: 1
 
 env:
-  - IMG_REPO={{ if index .Env "IMG_REPO"  }}{{ .Env.IMG_REPO }}{{ else }}ghcr.io/llmos-ai{{ end }}
+  - REGISTRY={{ if index .Env "REGISTRY"  }}{{ .Env.REGISTRY }}{{ else }}ghcr.io/llmos-ai{{ end }}
   - BUILDER={{ if index .Env "BUILDER"  }}{{ .Env.BUILDER }}{{ else }}default{{ end }}
   - VERSION={{ if index .Env "VERSION"  }}{{ .Env.VERSION }}{{ else }}{{ .Env.GITHUB_REF_NAME }}{{ end }}
 
@@ -81,7 +81,7 @@ dockers:
     goarch: amd64
     dockerfile: package/Dockerfile
     image_templates:
-      - "{{ .Env.IMG_REPO }}/llmos-dashboard:{{ .Env.VERSION }}-amd64"
+      - "{{ .Env.REGISTRY }}/llmos-dashboard:{{ .Env.VERSION }}-amd64"
     build_flag_templates:
       - "--builder={{ .Env.BUILDER }}"
       - "--pull"
@@ -101,7 +101,7 @@ dockers:
     goarch: arm64
     dockerfile: package/Dockerfile
     image_templates:
-      - "{{ .Env.IMG_REPO }}/llmos-dashboard:{{ .Env.VERSION }}-arm64"
+      - "{{ .Env.REGISTRY }}/llmos-dashboard:{{ .Env.VERSION }}-arm64"
     build_flag_templates:
       - "--builder={{ .Env.BUILDER }}"
       - "--pull"
@@ -118,10 +118,10 @@ dockers:
 
 docker_manifests:
   - use: docker
-    name_template: "{{ .Env.IMG_REPO }}/llmos-dashboard:{{ .Env.VERSION }}"
+    name_template: "{{ .Env.REGISTRY }}/llmos-dashboard:{{ .Env.VERSION }}"
     image_templates:
-      - "{{ .Env.IMG_REPO }}/llmos-dashboard:{{ .Env.VERSION }}-amd64"
-      - "{{ .Env.IMG_REPO }}/llmos-dashboard:{{ .Env.VERSION }}-arm64"
+      - "{{ .Env.REGISTRY }}/llmos-dashboard:{{ .Env.VERSION }}-amd64"
+      - "{{ .Env.REGISTRY }}/llmos-dashboard:{{ .Env.VERSION }}-arm64"
 
 docker_signs:
   - artifacts: all
