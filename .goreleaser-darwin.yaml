@@ -95,6 +95,7 @@ dockers:
     - ui/build
     - package/entrypoint.sh
     - static
+    - data
 
   - use: buildx
     goos: linux
@@ -115,6 +116,7 @@ dockers:
     - ui/build
     - package/entrypoint.sh
     - static
+    - data
 
 docker_manifests:
   - use: docker
@@ -126,4 +128,3 @@ docker_manifests:
 docker_signs:
   - artifacts: all
     stdin: "{{ .Env.COSIGN_PASSWORD }}"
-
